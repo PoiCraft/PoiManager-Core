@@ -16,9 +16,10 @@ class config(base):
     value = Column(String)
 
 
-class log(base):
+class bds_log(base):
     __tablename__ = 'bds_log'
     time = Column(DateTime, primary_key=True, index=True)
+    log_type = Column(String)
     log = Column(String)
 
 
