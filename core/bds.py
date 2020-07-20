@@ -2,13 +2,16 @@ import time
 import subprocess
 from datetime import datetime
 import threading
-from database import bds_log
-from database.config import get_config
-from database.database import bds_log as log
+from database import BdsLogger
+from database.ConfigHelper import get_config
+from database.database import bds_log
 
 # Run bds
 bds = subprocess.Popen(
-    get_config('bedrock_server'),
+    'cd %s \n %s' % (
+        get_config('bedrock_server_root'),
+        get_config('bedrock_server_script')
+    ),
     shell=True,
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE,
@@ -21,7 +24,7 @@ def save_log():
     for line in iter(bds.stdout.readline, b''):
         if line != '':
             line = line.replace('\n', '')
-            bds_log.put_log('bds', line)
+            BdsLogger.put_log('bds', line)
             print(line)
 
 
@@ -34,16 +37,15 @@ logger.start()
 # noinspection PyUnboundLocalVariable
 def cmd_in(cmd: str) -> bds_log:
     in_time = datetime.now()
-    bds_log.put_log('web_cmd_in', cmd)
+    BdsLogger.put_log('web_cmd_in', cmd)
     bds.stdin.write(cmd + '\n')
     bds.stdin.flush()
-    _log = log(time=in_time, log_type='bds', log='Null')
+    _log = bds_log(time=in_time, log_type='bds', log='Null')
     for _ in range(5):
         time.sleep(0.1)
-        __log = bds_log.get_log_all()[-1]
+        __log = BdsLogger.get_log_all()[-1]
         print(_log.time, in_time)
         if _log.time > in_time:
             _log = __log
             break
     return _log
-
