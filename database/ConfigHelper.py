@@ -16,22 +16,25 @@ default = dict(
     web_listening_port='5500'
 )
 
-session = get_session()
-
 
 def get_config(key: str):
+    session = get_session()
     _c = session.query(config).filter_by(key=key)
+    session.close()
     return _c.first().value
 
 
 def put_config(key: str, value: str):
+    session = get_session()
     _c = session.query(config).filter_by(key=key).first()
+    session.close()
     _c.value = value
     session.commit()
     session.close()
 
 
 def init():
+    session = get_session()
     for key in default:
         try:
             _config = config(key=key, value=default[key])
@@ -44,7 +47,9 @@ def init():
 
 # noinspection PyBroadException
 def print_and_edit():
+    session = get_session()
     _configs = session.query(config).all()
+    session.close()
     configs_keys = []
     for v in _configs:
         configs_keys.append(v.key)

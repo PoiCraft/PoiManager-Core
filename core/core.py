@@ -17,6 +17,7 @@ def index():
 def debug_config():
     session = get_session()
     _configs = session.query(config).all()
+    session.close()
     configs = {}
     for v in _configs:
         configs[v.key] = v.value
@@ -27,6 +28,7 @@ def debug_config():
 def debug_log():
     session = get_session()
     _logs = session.query(bds_log).all()
+    session.close()
     logs = {}
     for v in _logs:
         logs[str(v.time)] = [v.log_type, v.log]
