@@ -30,5 +30,5 @@ print('>Listening at %s:%s' % (
     get_config('web_listening_port')
 ))
 
-managerCore = ManagerCore(os.path.dirname(os.path.realpath(__file__)), debug=True)
+managerCore = ManagerCore(debug=True)
 managerCore.run()

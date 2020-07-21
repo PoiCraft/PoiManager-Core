@@ -7,7 +7,7 @@ import threading
 from geventwebsocket.websocket import WebSocket
 
 from database import BdsLogger
-from database.ConfigHelper import get_config, get_session
+from database.ConfigHelper import get_config
 from database.database import bds_log
 import sys
 import json

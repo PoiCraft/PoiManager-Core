@@ -16,21 +16,12 @@ from core.bds import BdsCore
 
 
 class ManagerCore:
-    def __init__(self, manager_root: str, debug=False):
-        self.manager_root = manager_root
+    def __init__(self, debug=False):
         self.app = Flask(__name__)
         self.socket = Sockets(self.app)
         self.route_web()
         self.route_debug()
         self.debug = debug
-        if not debug:
-            self.http_server = WSGIServer(
-                (
-                    get_config('web_listening_address'),
-                    int(get_config('web_listening_port'))
-                ),
-                self.app,
-                handler_class=WebSocketHandler)
         self.bds = BdsCore()
 
     def restart_bds(self):
@@ -109,4 +100,12 @@ class ManagerCore:
         if self.debug:
             self.app.run(get_config('web_listening_address'), int(get_config('web_listening_port')), debug=True)
         else:
+            # noinspection PyAttributeOutsideInit
+            self.http_server = WSGIServer(
+                (
+                    get_config('web_listening_address'),
+                    int(get_config('web_listening_port'))
+                ),
+                self.app,
+                handler_class=WebSocketHandler)
             self.http_server.serve_forever()
