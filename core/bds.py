@@ -52,22 +52,11 @@ class BdsCore:
     def on_stopped(self):
         BdsLogger.put_log('subprocess', 'stopped')
         print('>Server Stopped')
-        session = get_session()
-        if session.query(bds_log).filter_by(log_type='cmd_in').all()[-1].log != 'stop':
-            session.close()
-            BdsLogger.put_log('subprocess', 'Unexpected stopping')
-            print('>Unexpected stopping')
-            BdsLogger.put_log('manager', 'restart')
-            print('>restarting...')
-            python = sys.executable
-            os.execl(python, python, *sys.argv)
-        else:
-            session.close()
-            print('>Manager Stopping...')
-            BdsLogger.put_log('manager_core', 'stop')
-            print('>Manager Core stopped. Press Ctrl+C to exit.')
-            print('Enter \'restart\' to restart Manager.')
-            sys.exit()
+        print('>Manager Stopping...')
+        BdsLogger.put_log('manager_core', 'stop')
+        print('>Manager Core stopped. Press Ctrl+C to exit.')
+        print('Enter \'restart\' to restart Manager.')
+        sys.exit()
 
     def sent_to_all(self, msg_type: str, msg: str):
         clients = self.ws_client.copy()
