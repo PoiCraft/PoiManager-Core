@@ -34,10 +34,11 @@ class ManagerCore:
         self.bds = BdsCore(self.http_server, self.app, self.socket)
 
     def restart_bds(self):
+        self.bds.sent_to_all('manager', 'restart')
+        BdsLogger.put_log('manager', 'restart')
         if subprocess.Popen.poll(self.bds.bds) is None:
             self.bds.bds.stdin.write('stop')
             self.bds.bds.stdin.flush()
-        BdsLogger.put_log('manager', 'restart')
         print('>restarting...')
         python = sys.executable
         os.execl(python, python, *sys.argv)
@@ -46,6 +47,7 @@ class ManagerCore:
         while True:
             in_cmd = input()
             BdsLogger.put_log('cmd_in', in_cmd)
+            self.bds.sent_to_all('cmd_in', in_cmd)
             if in_cmd == 'restart':
                 self.restart_bds()
             else:
@@ -85,7 +87,14 @@ class ManagerCore:
             while not ws.closed:
                 message = ws.receive()
                 if message is not None:
-                    self.bds.cmd_in(message)
+                    self.bds.sent_to_all('cmd_in', message)
+                    if message == 'restart':
+                        ws.close('200', b'restarting...')
+                        self.restart_bds()
+                    else:
+                        result = self.bds.cmd_in(message)
+                        if result.log == 'Null':
+                            self.bds.sent_to_all('bds', 'done')
 
         @self.app.route('/debug/cmd/<cmd>')
         def debug_cmd(cmd_in):

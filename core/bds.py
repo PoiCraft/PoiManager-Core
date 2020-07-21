@@ -13,6 +13,7 @@ from database import BdsLogger
 from database.ConfigHelper import get_config, get_session
 from database.database import bds_log
 import sys
+import json
 
 
 class BdsCore:
@@ -61,6 +62,14 @@ class BdsCore:
             print('Enter \'restart\' to restart Manager.')
             sys.exit()
 
+    def sent_to_all(self, msg_type: str, msg: str):
+        clients = self.ws_client.copy()
+        for k in clients:
+            if not clients[k].closed:
+                clients[k].send(json.dumps({'type': msg_type, 'msg': msg}, ensure_ascii=False))
+            else:
+                del self.ws_client[k]
+
     # Save the logs from bds to db
     def save_log(self):
         for line in iter(self.bds.stdout.readline, b''):
@@ -68,12 +77,7 @@ class BdsCore:
                 self.on_stopped()
             if line != '':
                 line = line.replace('\n', '')
-                clients = self.ws_client.copy()
-                for k in clients:
-                    if not clients[k].closed:
-                        clients[k].send(line)
-                    else:
-                        del self.ws_client[k]
+                self.sent_to_all('bds', line)
                 BdsLogger.put_log('bds', line)
                 print(line)
 
@@ -82,13 +86,14 @@ class BdsCore:
     def cmd_in(self, cmd: str) -> bds_log:
         in_time = datetime.now()
         BdsLogger.put_log('cmd_in', cmd)
+        print('>>', cmd)
         self.bds.stdin.write(cmd + '\n')
         self.bds.stdin.flush()
         _log = bds_log(time=in_time, log_type='bds', log='Null')
         for _ in range(5):
             time.sleep(0.1)
             __log = BdsLogger.get_log_all()[-1]
-            if _log.time > in_time:
+            if __log.time > in_time:
                 _log = __log
                 break
         return _log
