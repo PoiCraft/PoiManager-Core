@@ -4,7 +4,10 @@ import sys
 import threading
 
 from flask import Flask
+from flask_sockets import Sockets
 from gevent.pywsgi import WSGIServer
+from geventwebsocket.handler import WebSocketHandler
+from geventwebsocket.websocket import WebSocket
 
 from database import BdsLogger
 from database.ConfigHelper import get_config
@@ -15,6 +18,7 @@ from core.bds import BdsCore
 class ManagerCore:
     # Init flask
     app = Flask(__name__)
+    socket = Sockets(app)
 
     def __init__(self, debug=False):
         self.web()
@@ -25,8 +29,9 @@ class ManagerCore:
                 get_config('web_listening_address'),
                 int(get_config('web_listening_port'))
             ),
-            self.app)
-        self.bds = BdsCore(self.http_server)
+            self.app,
+            handler_class=WebSocketHandler)
+        self.bds = BdsCore(self.http_server, self.app, self.socket)
 
     def restart_bds(self):
         if subprocess.Popen.poll(self.bds.bds) is None:
@@ -74,9 +79,17 @@ class ManagerCore:
                 logs[str(v.time)] = [v.log_type, v.log]
             return logs
 
+        @self.socket.route('/debug/cmd')
+        def cmd(ws: WebSocket):
+            self.bds.add_ws(ws)
+            while not ws.closed:
+                message = ws.receive()
+                if message is not None:
+                    self.bds.cmd_in(message)
+
         @self.app.route('/debug/cmd/<cmd>')
-        def debug_cmd(cmd):
-            _log = self.bds.cmd_in(cmd)
+        def debug_cmd(cmd_in):
+            _log = self.bds.cmd_in(cmd_in)
             return {'time': _log.time,
                     'type': _log.log_type,
                     'log': _log.log

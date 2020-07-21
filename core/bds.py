@@ -4,7 +4,10 @@ import subprocess
 from datetime import datetime
 import threading
 
+from flask import Flask
+from flask_sockets import Sockets
 from gevent.pywsgi import WSGIServer
+from geventwebsocket.websocket import WebSocket
 
 from database import BdsLogger
 from database.ConfigHelper import get_config, get_session
@@ -13,8 +16,16 @@ import sys
 
 
 class BdsCore:
-    def __init__(self, server: WSGIServer):
+
+    ws_client = {}
+
+    def add_ws(self, ws: WebSocket):
+        self.ws_client[len(self.ws_client)] = ws
+
+    def __init__(self, server: WSGIServer, app: Flask, ws: Sockets):
         self.server = server
+        self.app = app
+        self.ws = ws
         self.bds = subprocess.Popen(
             'cd %s \n %s' % (
                 get_config('bedrock_server_root'),
@@ -57,6 +68,12 @@ class BdsCore:
                 self.on_stopped()
             if line != '':
                 line = line.replace('\n', '')
+                clients = self.ws_client.copy()
+                for k in clients:
+                    if not clients[k].closed:
+                        clients[k].send(line)
+                    else:
+                        del self.ws_client[k]
                 BdsLogger.put_log('bds', line)
                 print(line)
 
