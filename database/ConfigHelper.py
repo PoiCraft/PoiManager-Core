@@ -27,7 +27,6 @@ def get_config(key: str):
 def put_config(key: str, value: str):
     session = get_session()
     _c = session.query(config).filter_by(key=key).first()
-    session.close()
     _c.value = value
     session.commit()
     session.close()
