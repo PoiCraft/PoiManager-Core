@@ -13,15 +13,20 @@ default = dict(
     bedrock_server_root='./bedrock_server',
     bedrock_server_script=get_script(),
     web_listening_address='127.0.0.1',
-    web_listening_port='5500'
+    web_listening_port='5500',
+    token_length='16'
 )
 
 
 def get_config(key: str):
     session = get_session()
-    _c = session.query(config).filter_by(key=key)
+    _c = session.query(config).filter_by(key=key).first()
+    if _c is None:
+        _c = config(key=key, value=default[key])
+        session.add(_c)
+        session.commit()
     session.close()
-    return _c.first().value
+    return default[key]
 
 
 def put_config(key: str, value: str):

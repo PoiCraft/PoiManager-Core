@@ -9,6 +9,7 @@ from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
 from geventwebsocket.websocket import WebSocket
 
+from auth.Token import TokenManager
 from database import BdsLogger
 from database.ConfigHelper import get_config
 from database.database import get_session, config, bds_log
@@ -16,7 +17,8 @@ from core.bds import BdsCore
 
 
 class ManagerCore:
-    def __init__(self, debug=False):
+    def __init__(self, token_manager: TokenManager, debug=False):
+        self.tokenManager = token_manager
         self.app = Flask(__name__)
         self.socket = Sockets(self.app)
         self.route_web()
@@ -47,6 +49,7 @@ class ManagerCore:
     def route_web(self):
         # Home
         @self.app.route('/')
+        @self.tokenManager.require_token
         def index():
             return 'Hello World'
 
