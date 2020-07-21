@@ -88,9 +88,8 @@ class ManagerCore:
                 message = ws.receive()
                 if message is not None:
                     self.bds.sent_to_all('cmd_in', message)
-                    if message == 'restart':
-                        ws.close('200', b'restarting...')
-                        self.restart_bds()
+                    if message.split(' ')[0] in self.bds.danger_cmd:
+                        self.bds.sent_to_all('bds', 'Not supported via WebSocket')
                     else:
                         result = self.bds.cmd_in(message)
                         if result.log == 'Null':

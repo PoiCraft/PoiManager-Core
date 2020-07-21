@@ -18,6 +18,10 @@ import json
 
 class BdsCore:
 
+    danger_cmd = [
+        'restart',
+        'stop'
+    ]
     ws_client = {}
 
     def add_ws(self, ws: WebSocket):

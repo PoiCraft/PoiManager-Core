@@ -1,4 +1,3 @@
-import os
 import sys
 from database import BdsLogger
 from database.ConfigHelper import get_config
