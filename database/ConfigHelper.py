@@ -6,11 +6,11 @@ def get_script():
     if 'linux' in sys.platform:
         return 'LD_LIBRARY_PATH=. ./bedrock_server'
     elif 'win' in sys.platform:
-        return './bedrock_server.exe'
+        return 'bedrock_server.exe'
 
 
 default = dict(
-    bedrock_server_root='bedrock_server',
+    bedrock_server_root='./bedrock_server',
     bedrock_server_script=get_script(),
     web_listening_address='127.0.0.1',
     web_listening_port='5500'

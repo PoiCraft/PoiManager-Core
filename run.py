@@ -1,3 +1,4 @@
+import os
 import sys
 from database import BdsLogger
 from database.ConfigHelper import get_config
@@ -29,5 +30,5 @@ print('>Listening at %s:%s' % (
     get_config('web_listening_port')
 ))
 
-managerCore = ManagerCore(debug=True)
+managerCore = ManagerCore(os.path.dirname(os.path.realpath(__file__)), debug=True)
 managerCore.run()

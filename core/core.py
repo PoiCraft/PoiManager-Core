@@ -16,22 +16,22 @@ from core.bds import BdsCore
 
 
 class ManagerCore:
-    # Init flask
-    app = Flask(__name__)
-    socket = Sockets(app)
-
-    def __init__(self, debug=False):
-        self.web()
-        if debug:
-            self.debug()
-        self.http_server = WSGIServer(
-            (
-                get_config('web_listening_address'),
-                int(get_config('web_listening_port'))
-            ),
-            self.app,
-            handler_class=WebSocketHandler)
-        self.bds = BdsCore(self.http_server, self.app, self.socket)
+    def __init__(self, manager_root: str, debug=False):
+        self.manager_root = manager_root
+        self.app = Flask(__name__)
+        self.socket = Sockets(self.app)
+        self.route_web()
+        self.route_debug()
+        self.debug = debug
+        if not debug:
+            self.http_server = WSGIServer(
+                (
+                    get_config('web_listening_address'),
+                    int(get_config('web_listening_port'))
+                ),
+                self.app,
+                handler_class=WebSocketHandler)
+        self.bds = BdsCore()
 
     def restart_bds(self):
         self.bds.sent_to_all('manager', 'restart')
@@ -53,13 +53,13 @@ class ManagerCore:
             else:
                 self.bds.cmd_in(in_cmd)
 
-    def web(self):
+    def route_web(self):
         # Home
         @self.app.route('/')
         def index():
             return 'Hello World'
 
-    def debug(self):
+    def route_debug(self):
         # For debug
         @self.app.route('/debug/config')
         def debug_config():
@@ -95,7 +95,7 @@ class ManagerCore:
                         if result.log == 'Null':
                             self.bds.sent_to_all('bds', 'done')
 
-        @self.app.route('/debug/cmd/<cmd>')
+        @self.app.route('/debug/cmd/<cmd_in>')
         def debug_cmd(cmd_in):
             _log = self.bds.cmd_in(cmd_in)
             return {'time': _log.time,
@@ -106,4 +106,7 @@ class ManagerCore:
     def run(self):
         t_in = threading.Thread(target=self.terminal_in)
         t_in.start()
-        self.http_server.serve_forever()
+        if self.debug:
+            self.app.run(get_config('web_listening_address'), int(get_config('web_listening_port')), debug=True)
+        else:
+            self.http_server.serve_forever()

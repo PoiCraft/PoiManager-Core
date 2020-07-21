@@ -1,12 +1,10 @@
 import os
+import sys
 import time
 import subprocess
 from datetime import datetime
 import threading
 
-from flask import Flask
-from flask_sockets import Sockets
-from gevent.pywsgi import WSGIServer
 from geventwebsocket.websocket import WebSocket
 
 from database import BdsLogger
@@ -27,16 +25,22 @@ class BdsCore:
     def add_ws(self, ws: WebSocket):
         self.ws_client[len(self.ws_client)] = ws
 
-    def __init__(self, server: WSGIServer, app: Flask, ws: Sockets):
-        self.server = server
-        self.app = app
-        self.ws = ws
-        self.bds = subprocess.Popen(
-            'cd %s \n %s' % (
+    def __iit__(self):
+        if 'linux' in sys.platform:
+            self.script = 'cd %s \n %s' % (
                 get_config('bedrock_server_root'),
                 get_config('bedrock_server_script')
-            ),
-            shell=True,
+            )
+            self.shell = True
+        elif 'win' in sys.platform:
+            self.script = os.path.join(
+                get_config('bedrock_server_root'),
+                get_config('bedrock_server_script')
+            )
+            self.shell = False
+        self.bds = subprocess.Popen(
+            self.script,
+            shell=self.shell,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             universal_newlines=True
