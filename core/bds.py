@@ -25,7 +25,7 @@ class BdsCore:
     def add_ws(self, ws: WebSocket):
         self.ws_client[len(self.ws_client)] = ws
 
-    def __iit__(self):
+    def __init__(self):
         if 'linux' in sys.platform:
             self.script = 'cd %s \n %s' % (
                 get_config('bedrock_server_root'),
