@@ -1,9 +1,9 @@
+import os
 import sys
-from gevent.pywsgi import WSGIServer
 from database import BdsLogger
 from database.ConfigHelper import get_config
-from core.core import app
 import signal
+from core.core import ManagerCore
 
 
 # noinspection PyUnusedLocal
@@ -30,10 +30,5 @@ print('>Listening at %s:%s' % (
     get_config('web_listening_port')
 ))
 
-http_server = WSGIServer(
-    (
-        get_config('web_listening_address'),
-        int(get_config('web_listening_port'))
-    ),
-    app)
-http_server.serve_forever()
+managerCore = ManagerCore(debug=True)
+managerCore.run()
