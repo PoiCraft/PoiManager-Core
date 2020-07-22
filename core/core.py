@@ -25,6 +25,7 @@ class ManagerCore:
         self.app = Flask(name)
         self.socket = Sockets(self.app)
         self.route_web()
+        self.route_ws()
         self.route_debug()
 
     def restart_bds(self):
@@ -50,32 +51,10 @@ class ManagerCore:
     def route_web(self):
         # Home
         @self.app.route('/', methods=['GET', 'POST'])
-        @self.tokenManager.require_token
         def index():
             return 'Hello World'
 
-    def route_debug(self):
-        # For debug
-        @self.app.route('/debug/config')
-        def debug_config():
-            session = get_session()
-            _configs = session.query(config).all()
-            session.close()
-            configs = {}
-            for v in _configs:
-                configs[v.key] = v.value
-            return configs
-
-        @self.app.route('/debug/log')
-        def debug_log():
-            session = get_session()
-            _logs = session.query(bds_log).all()
-            session.close()
-            logs = {}
-            for v in _logs:
-                logs[str(v.time)] = [v.log_type, v.log]
-            return logs
-
+    def route_ws(self):
         # noinspection PyUnusedLocal
         def cmd_in_via_ws(cmd_in):
             if cmd_in is None:
@@ -88,7 +67,7 @@ class ManagerCore:
                 if result.log == 'Null':
                     self.bds.sent_to_all('bds', 'done')
 
-        @self.socket.route('/debug/cmd')
+        @self.socket.route('/ws/cmd')
         def cmd(ws: WebSocket):
             ws_id = self.bds.add_ws(ws)
             while not ws.closed:
@@ -109,7 +88,32 @@ class ManagerCore:
                     else:
                         ws.send(json.dumps(self.tokenManager.error_msg, ensure_ascii=False))
 
+    def route_debug(self):
+        # For debug
+        @self.app.route('/debug/config')
+        @self.tokenManager.require_token
+        def debug_config():
+            session = get_session()
+            _configs = session.query(config).all()
+            session.close()
+            configs = {}
+            for v in _configs:
+                configs[v.key] = v.value
+            return configs
+
+        @self.app.route('/debug/log')
+        @self.tokenManager.require_token
+        def debug_log():
+            session = get_session()
+            _logs = session.query(bds_log).all()
+            session.close()
+            logs = {}
+            for v in _logs:
+                logs[str(v.time)] = [v.log_type, v.log]
+            return logs
+
         @self.app.route('/debug/cmd/<cmd_in>')
+        @self.tokenManager.require_token
         def debug_cmd(cmd_in):
             _log = self.bds.cmd_in(cmd_in)
             return {'time': _log.time,

@@ -47,6 +47,6 @@ class TokenManager:
             if _pass:
                 return func(*args, **kwargs)
             else:
-                return {'code': '401', 'type': 'auth', 'msg': 'Unauthorized operation'}, 401
+                return self.error_msg, 401
 
         return wrapper
