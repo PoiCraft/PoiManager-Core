@@ -1,7 +1,7 @@
-import os
 import sys
 
 from auth.Token import TokenManager
+from core.bds import BdsCore
 from database import BdsLogger
 from database.ConfigHelper import get_config
 import signal
@@ -20,19 +20,21 @@ signal.signal(signal.SIGINT, CtrlC)
 # noinspection PyTypeChecker
 signal.signal(signal.SIGTERM, CtrlC)
 
-BdsLogger.put_log('manager', 'start')
-BdsLogger.put_log('manager', '%s:%s' % (
-    get_config('web_listening_address'),
-    get_config('web_listening_port')
-))
+if __name__ == '__main__':
+    BdsLogger.put_log('manager', 'start')
+    BdsLogger.put_log('manager', '%s:%s' % (
+        get_config('web_listening_address'),
+        get_config('web_listening_port')
+    ))
 
-print('>Listening at %s:%s' % (
-    get_config('web_listening_address'),
-    get_config('web_listening_port')
-))
+    print('>Listening at %s:%s' % (
+        get_config('web_listening_address'),
+        get_config('web_listening_port')
+    ))
 
-tokenManager = TokenManager()
-print('> Manager Token: %s' % tokenManager.token)
+    tokenManager = TokenManager()
+    print('>Manager Token: %s' % tokenManager.token)
 
-managerCore = ManagerCore(token_manager=tokenManager, debug=True)
-managerCore.run()
+    bdsCore = BdsCore()
+    managerCore = ManagerCore(token_manager=tokenManager, bds=bdsCore, name=__name__)
+    managerCore.run()

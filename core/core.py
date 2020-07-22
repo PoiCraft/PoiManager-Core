@@ -17,14 +17,14 @@ from core.bds import BdsCore
 
 
 class ManagerCore:
-    def __init__(self, token_manager: TokenManager, debug=False):
+    def __init__(self, token_manager: TokenManager, bds: BdsCore, name: str):
+        self.bds = bds
         self.tokenManager = token_manager
-        self.app = Flask(__name__)
+        self.t_in = threading.Thread(target=self.terminal_in)
+        self.app = Flask(name)
         self.socket = Sockets(self.app)
         self.route_web()
         self.route_debug()
-        self.debug = debug
-        self.bds = BdsCore()
 
     def restart_bds(self):
         self.bds.sent_to_all('manager', 'restart')
@@ -98,17 +98,13 @@ class ManagerCore:
                     }
 
     def run(self):
-        t_in = threading.Thread(target=self.terminal_in)
-        t_in.start()
-        if self.debug:
-            self.app.run(get_config('web_listening_address'), int(get_config('web_listening_port')), debug=True)
-        else:
-            # noinspection PyAttributeOutsideInit
-            self.http_server = WSGIServer(
-                (
-                    get_config('web_listening_address'),
-                    int(get_config('web_listening_port'))
-                ),
-                self.app,
-                handler_class=WebSocketHandler)
-            self.http_server.serve_forever()
+        self.t_in.start()
+        # noinspection PyAttributeOutsideInit
+        self.http_server = WSGIServer(
+            (
+                get_config('web_listening_address'),
+                int(get_config('web_listening_port'))
+            ),
+            self.app,
+            handler_class=WebSocketHandler)
+        self.http_server.serve_forever()
