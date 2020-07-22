@@ -22,7 +22,12 @@ class TokenManager:
         return self.checkToken(_token)
 
     def json_get(self):
-        _token = request.get_json().get('token', '')
+        _token = ''
+        __json = request.get_json()
+        if __json:
+            _token = __json.get('token', '')
+        else:
+            _token = request.form.get('token', '')
         return self.checkToken(_token)
 
     def require_token(self, func):
