@@ -4,11 +4,12 @@ import subprocess
 import sys
 import threading
 
-from flask import Flask
+from flask import Flask, abort
 from flask_sockets import Sockets
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
 from geventwebsocket.websocket import WebSocket
+from werkzeug.exceptions import HTTPException
 
 from auth.Token import TokenManager
 from core.bds import BdsCore
@@ -49,6 +50,18 @@ class ManagerCore:
                 self.bds.cmd_in(in_cmd)
 
     def route_web(self):
+        @self.app.errorhandler(HTTPException)
+        def error(e):
+            res = e.get_response()
+            res.data = json.dumps({
+                'code': e.code,
+                'type': 'core',
+                'name': e.name,
+                'msg': e.description
+            })
+            res.content_type = 'application/json'
+            return res
+
         # Home
         @self.app.route('/', methods=['GET', 'POST'])
         def index():
@@ -90,6 +103,10 @@ class ManagerCore:
 
     def route_debug(self):
         # For debug
+        @self.app.route('/debug/code/<int:code>')
+        def debug_err(code: int):
+            abort(code)
+
         @self.app.route('/debug/config')
         @self.tokenManager.require_token
         def debug_config():
