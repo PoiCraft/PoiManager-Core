@@ -20,10 +20,12 @@ class BdsCore:
         'stop'
     ]
     ws_client = {}
+    ws_client_len = 0
 
     def add_ws(self, ws: WebSocket):
-        self.ws_client[len(self.ws_client)] = [ws, False]
-        return len(self.ws_client) - 1
+        self.ws_client[self.ws_client_len] = [ws, False]
+        self.ws_client_len += 1
+        return self.ws_client_len - 1
 
     def update_ws(self, ws_id: int):
         client = self.ws_client[ws_id]
