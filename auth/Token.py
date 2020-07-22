@@ -1,5 +1,6 @@
 import json
 import random
+from functools import wraps
 
 from geventwebsocket.websocket import WebSocket
 
@@ -38,6 +39,7 @@ class TokenManager:
         return self.checkToken(_token)
 
     def require_token(self, func):
+        @wraps(func)
         def wrapper(*args, **kwargs):
             _pass = False
             if request.method == 'GET':
