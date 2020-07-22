@@ -40,11 +40,12 @@ def put_config(key: str, value: str):
 def init():
     session = get_session()
     for key in default:
+        # noinspection PyBroadException
         try:
             _config = config(key=key, value=default[key])
             session.add(_config)
             session.commit()
-        finally:
+        except:
             pass
     session.close()
 

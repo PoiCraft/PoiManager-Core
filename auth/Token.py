@@ -1,4 +1,8 @@
+import json
 import random
+
+from geventwebsocket.websocket import WebSocket
+
 from database.ConfigHelper import get_config
 
 from flask import request
@@ -7,6 +11,9 @@ token_char = 'abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
 class TokenManager:
+
+    error_msg = {'code': '401', 'type': 'auth', 'msg': 'Unauthorized operation'}
+    pass_msg = {'code': '200', 'type': 'auth', 'msg': 'OK'}
 
     def __init__(self):
         self.token = ''.join(random.sample(token_char, int(get_config('token_length'))))
@@ -41,4 +48,5 @@ class TokenManager:
                 return func(*args, **kwargs)
             else:
                 return {'code': '401', 'type': 'auth', 'msg': 'Unauthorized operation'}, 401
+
         return wrapper

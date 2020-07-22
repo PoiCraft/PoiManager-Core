@@ -22,7 +22,21 @@ class BdsCore:
     ws_client = {}
 
     def add_ws(self, ws: WebSocket):
-        self.ws_client[len(self.ws_client)] = ws
+        self.ws_client[len(self.ws_client)] = [ws, False]
+        return len(self.ws_client) - 1
+
+    def update_ws(self, ws_id: int):
+        client = self.ws_client[ws_id]
+        if client[1] is False:
+            to_return = 1
+        else:
+            to_return = 0
+        client[1] = True
+        self.ws_client[ws_id] = client
+        return to_return
+
+    def check_ws(self, ws_id: int):
+        return self.ws_client[ws_id][1]
 
     def __init__(self):
         if 'linux' in sys.platform:
@@ -61,8 +75,9 @@ class BdsCore:
     def sent_to_all(self, msg_type: str, msg: str):
         clients = self.ws_client.copy()
         for k in clients:
-            if not clients[k].closed:
-                clients[k].send(json.dumps({'type': msg_type, 'msg': msg}, ensure_ascii=False))
+            if not clients[k][0].closed:
+                if clients[k][1]:
+                    clients[k][0].send(json.dumps({'type': msg_type, 'msg': msg}, ensure_ascii=False))
             else:
                 del self.ws_client[k]
 
