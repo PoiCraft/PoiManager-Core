@@ -11,10 +11,10 @@ from geventwebsocket.handler import WebSocketHandler
 from geventwebsocket.websocket import WebSocket
 
 from auth.Token import TokenManager
+from core.bds import BdsCore
 from database import BdsLogger
 from database.ConfigHelper import get_config
 from database.database import get_session, config, bds_log
-from core.bds import BdsCore
 
 
 class ManagerCore:

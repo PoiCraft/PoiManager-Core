@@ -1,11 +1,11 @@
+import signal
 import sys
 
 from auth.Token import TokenManager
 from core.bds import BdsCore
+from core.core import ManagerCore
 from database import BdsLogger
 from database.ConfigHelper import get_config
-import signal
-from core.core import ManagerCore
 
 
 # noinspection PyUnusedLocal

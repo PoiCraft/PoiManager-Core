@@ -1,12 +1,9 @@
-import json
 import random
 from functools import wraps
 
-from geventwebsocket.websocket import WebSocket
+from flask import request
 
 from database.ConfigHelper import get_config
-
-from flask import request
 
 token_char = 'abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 

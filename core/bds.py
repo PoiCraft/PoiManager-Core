@@ -1,16 +1,16 @@
+import json
 import os
-import time
 import subprocess
-from datetime import datetime
+import sys
 import threading
+import time
+from datetime import datetime
 
 from geventwebsocket.websocket import WebSocket
 
 from database import BdsLogger
 from database.ConfigHelper import get_config
 from database.database import bds_log
-import sys
-import json
 
 
 class BdsCore:

@@ -1,6 +1,5 @@
-from database.database import create_db
 from database.ConfigHelper import init, print_and_edit
-
+from database.database import create_db
 
 print('Creating database...')
 create_db()
