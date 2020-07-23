@@ -43,5 +43,5 @@ if __name__ == '__main__':
                               bds=bdsCore,
                               prop_loader=prop_loader,
                               name=__name__,
-                              debug = True)
+                              debug=True)
     managerCore.run()

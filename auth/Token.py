@@ -5,7 +5,7 @@ from flask import request
 
 from database.ConfigHelper import get_config
 
-token_char = 'abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+token_char = 'abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ`-=~!@#$%^&*()_+[]\\;\',./<>?:"{}|'
 
 
 class TokenManager:
