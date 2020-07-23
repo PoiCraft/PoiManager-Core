@@ -6,6 +6,7 @@ from core.bds import BdsCore
 from core.core import ManagerCore
 from database import BdsLogger
 from database.ConfigHelper import get_config
+from loader.PropertiesLoader import PropertiesLoader
 
 
 # noinspection PyUnusedLocal
@@ -35,6 +36,12 @@ if __name__ == '__main__':
     tokenManager = TokenManager()
     print('>Manager Token: %s' % tokenManager.token)
 
+    prop_loader = PropertiesLoader()
     bdsCore = BdsCore()
-    managerCore = ManagerCore(token_manager=tokenManager, bds=bdsCore, name=__name__)
+
+    managerCore = ManagerCore(token_manager=tokenManager,
+                              bds=bdsCore,
+                              prop_loader=prop_loader,
+                              name=__name__,
+                              debug = True)
     managerCore.run()

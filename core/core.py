@@ -16,18 +16,27 @@ from core.bds import BdsCore
 from database import BdsLogger
 from database.ConfigHelper import get_config
 from database.database import get_session, config, bds_log
+from loader.PropertiesLoader import PropertiesLoader
 
 
 class ManagerCore:
-    def __init__(self, token_manager: TokenManager, bds: BdsCore, name: str):
+    def __init__(self,
+                 token_manager: TokenManager,
+                 prop_loader: PropertiesLoader,
+                 bds: BdsCore,
+                 name: str,
+                 debug=False):
+        self.debug = debug
         self.bds = bds
         self.tokenManager = token_manager
+        self.propLoader = prop_loader
         self.t_in = threading.Thread(target=self.terminal_in)
         self.app = Flask(name)
         self.socket = Sockets(self.app)
         self.route_web()
         self.route_ws()
-        self.route_debug()
+        if self.debug:
+            self.route_debug()
 
     def restart_bds(self):
         self.bds.sent_to_all('manager', 'restart')
@@ -108,7 +117,6 @@ class ManagerCore:
             abort(code)
 
         @self.app.route('/debug/config')
-        @self.tokenManager.require_token
         def debug_config():
             session = get_session()
             _configs = session.query(config).all()
@@ -119,7 +127,6 @@ class ManagerCore:
             return configs
 
         @self.app.route('/debug/log')
-        @self.tokenManager.require_token
         def debug_log():
             session = get_session()
             _logs = session.query(bds_log).all()
@@ -130,7 +137,6 @@ class ManagerCore:
             return logs
 
         @self.app.route('/debug/cmd/<cmd_in>')
-        @self.tokenManager.require_token
         def debug_cmd(cmd_in):
             _log = self.bds.cmd_in(cmd_in)
             return {'time': _log.time,
@@ -138,8 +144,52 @@ class ManagerCore:
                     'log': _log.log
                     }
 
+        @self.app.route('/debug/prop')
+        def debug_prop():
+            return self.propLoader.prop
+
+        @self.app.route('/debug/prop/<key>')
+        def debug_prop_value(key):
+            value = self.propLoader.get_prop(key)
+            body = {
+                'code': 200,
+                'key': key,
+                'value': value
+            }
+            if value is None:
+                body['code'] = 404
+                body['msg'] = 'No such key'
+            return body, body['code']
+
+        @self.app.route('/debug/prop/<key>/<value>')
+        def debug_prop_edit(key, value):
+            _e = self.propLoader.edit_prop(key, value)
+            return {
+                'code': 200,
+                'prop': self.propLoader.prop,
+                'edited': _e
+            }
+
+        @self.app.route('/debug/prop/if_edited')
+        def debug_prop_if_edited():
+            return {
+                'code': 200,
+                'msg': self.propLoader.if_edited()
+            }
+
+        @self.app.route('/debug/prop/save')
+        def debug_prop_save():
+            self.propLoader.save()
+            return {
+                'code': 200,
+                'prop': self.propLoader.prop,
+                'edited': self.propLoader.if_edited()
+            }
+
     def run(self):
         self.t_in.start()
+        if self.debug:
+            self.app.debug = True
         # noinspection PyAttributeOutsideInit
         self.http_server = WSGIServer(
             (

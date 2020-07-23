@@ -13,6 +13,9 @@ def get_script():
 default = dict(
     bedrock_server_root='./bedrock_server',
     bedrock_server_script=get_script(),
+    bedrock_server_properties='server.properties',
+    bedrock_server_whitelist='whitelist.json',
+    bedrock_server_permissions='permissions.json',
     web_listening_address='127.0.0.1',
     web_listening_port='5500',
     token_length='16'
