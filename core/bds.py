@@ -59,7 +59,8 @@ class BdsCore:
             shell=self.shell,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            universal_newlines=True
+            universal_newlines=True,
+            encoding='utf-8'
         )
         # Keep the `save_log` running
         logger = threading.Thread(target=self.save_log)
