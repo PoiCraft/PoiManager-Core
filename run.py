@@ -39,6 +39,9 @@ if __name__ == '__main__':
     prop_loader = PropertiesLoader()
     bdsCore = BdsCore()
 
+    if get_config('clear_log_on_start') == 'true':
+        BdsLogger.clear_log()
+
     managerCore = ManagerCore(token_manager=tokenManager,
                               bds=bdsCore,
                               prop_loader=prop_loader,

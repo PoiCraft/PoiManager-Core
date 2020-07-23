@@ -17,6 +17,7 @@ from database import BdsLogger
 from database.ConfigHelper import get_config
 from database.database import get_session, config, bds_log
 from loader.PropertiesLoader import PropertiesLoader
+from api.api import Api_Log
 
 
 class ManagerCore:
@@ -33,7 +34,20 @@ class ManagerCore:
         self.t_in = threading.Thread(target=self.terminal_in)
         self.app = Flask(name)
         self.socket = Sockets(self.app)
-        self.route_web()
+        self.api_log = Api_Log(app=self.app, token_manager=self.tokenManager)
+
+        @self.app.errorhandler(HTTPException)
+        def error(e):
+            res = e.get_response()
+            res.data = json.dumps({
+                'code': e.code,
+                'type': 'core',
+                'name': e.name,
+                'msg': e.description
+            })
+            res.content_type = 'application/json'
+            return res
+
         self.route_ws()
         if self.debug:
             self.route_debug()
@@ -59,18 +73,6 @@ class ManagerCore:
                 self.bds.cmd_in(in_cmd)
 
     def route_web(self):
-        @self.app.errorhandler(HTTPException)
-        def error(e):
-            res = e.get_response()
-            res.data = json.dumps({
-                'code': e.code,
-                'type': 'core',
-                'name': e.name,
-                'msg': e.description
-            })
-            res.content_type = 'application/json'
-            return res
-
         # Home
         @self.app.route('/', methods=['GET', 'POST'])
         def index():

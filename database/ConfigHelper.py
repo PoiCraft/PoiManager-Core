@@ -18,7 +18,8 @@ default = dict(
     bedrock_server_permissions='permissions.json',
     web_listening_address='127.0.0.1',
     web_listening_port='5500',
-    token_length='32'
+    token_length='32',
+    clear_log_on_start='true'
 )
 
 
