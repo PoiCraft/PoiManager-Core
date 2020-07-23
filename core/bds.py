@@ -48,8 +48,9 @@ class BdsCore:
             )
             self.shell = True
         elif 'win' in sys.platform:
+            os.chdir(os.path.join(os.getcwd(), get_config('bedrock_server_root')))
             self.script = os.path.join(
-                get_config('bedrock_server_root'),
+                os.getcwd(),
                 get_config('bedrock_server_script')
             )
             self.shell = False
