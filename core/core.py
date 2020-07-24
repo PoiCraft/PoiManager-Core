@@ -17,7 +17,8 @@ from database import BdsLogger
 from database.ConfigHelper import get_config
 from database.database import get_session, config, bds_log
 from loader.PropertiesLoader import PropertiesLoader
-from api.api import Api_Log
+from api.api_log import Api_Log
+from api.api_config import Api_Config
 
 
 class ManagerCore:
@@ -35,6 +36,7 @@ class ManagerCore:
         self.app = Flask(name)
         self.socket = Sockets(self.app)
         self.api_log = Api_Log(app=self.app, token_manager=self.tokenManager)
+        self.api_config = Api_Config(app=self.app, token_manager=self.tokenManager)
 
         @self.app.errorhandler(HTTPException)
         def error(e):
@@ -117,26 +119,6 @@ class ManagerCore:
         @self.app.route('/debug/code/<int:code>')
         def debug_err(code: int):
             abort(code)
-
-        @self.app.route('/debug/config')
-        def debug_config():
-            session = get_session()
-            _configs = session.query(config).all()
-            session.close()
-            configs = {}
-            for v in _configs:
-                configs[v.key] = v.value
-            return configs
-
-        @self.app.route('/debug/log')
-        def debug_log():
-            session = get_session()
-            _logs = session.query(bds_log).all()
-            session.close()
-            logs = {}
-            for v in _logs:
-                logs[str(v.time)] = [v.log_type, v.log]
-            return logs
 
         @self.app.route('/debug/cmd/<cmd_in>')
         def debug_cmd(cmd_in):

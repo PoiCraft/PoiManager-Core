@@ -26,12 +26,15 @@ default = dict(
 def get_config(key: str):
     session = get_session()
     _c = session.query(config).filter_by(key=key).first()
-    if _c is None:
+    if (_c is None) and (key in default.keys()):
         _c = config(key=key, value=default[key])
         session.add(_c)
         session.commit()
     session.close()
-    return default[key]
+    if _c is None:
+        return None
+    else:
+        return _c.value
 
 
 def put_config(key: str, value: str):
@@ -40,6 +43,7 @@ def put_config(key: str, value: str):
     _c.value = value
     session.commit()
     session.close()
+    return value
 
 
 def init():
