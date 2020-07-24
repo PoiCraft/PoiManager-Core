@@ -1,7 +1,4 @@
 import json
-import os
-import subprocess
-import sys
 import threading
 
 from flask import Flask, abort
@@ -12,7 +9,6 @@ from werkzeug.exceptions import HTTPException
 
 from auth.Token import TokenManager
 from core.bds import BdsCore
-from database import BdsLogger
 from database.ConfigHelper import get_config
 from loader.PropertiesLoader import PropertiesLoader
 from api.api_log import Api_Log
@@ -70,14 +66,7 @@ class ManagerCore:
             self.route_debug()
 
     def restart_bds(self):
-        self.bds.sent_to_all('manager', 'restart')
-        BdsLogger.put_log('manager', 'restart')
-        if subprocess.Popen.poll(self.bds.bds) is None:
-            self.bds.bds.stdin.write('stop')
-            self.bds.bds.stdin.flush()
-        print('>restarting...')
-        python = sys.executable
-        os.execl(python, python, *sys.argv)
+        self.bds.bds_restart()
 
     def terminal_in(self):
         while True:

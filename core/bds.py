@@ -14,9 +14,10 @@ from database.database import bds_log
 
 
 class BdsCore:
-
     ws_client = {}
     ws_client_len = 0
+
+    need_log = True
 
     def add_ws(self, ws: WebSocket):
         self.ws_client[self.ws_client_len] = [ws, False]
@@ -59,21 +60,40 @@ class BdsCore:
             encoding='utf-8'
         )
         # Keep the `save_log` running
-        logger = threading.Thread(target=self.save_log)
-        logger.start()
+        self.logger = threading.Thread(target=self.save_log)
+        self.logger.start()
 
     # noinspection PyMethodMayBeStatic
     def on_stopped(self):
         self.sent_to_all('bds', 'stopping')
-        for k in self.ws_client:
-            self.ws_client[k][0].close()
         BdsLogger.put_log('subprocess', 'stopped')
         print('>Server Stopped')
-        print('>Manager Stopping...')
-        BdsLogger.put_log('manager_core', 'stop')
-        print('>Manager Core stopped. Press Ctrl+C to exit.')
+        print('>Bedrock Server stopped. Press Ctrl+C to exit.')
         print('Enter \'restart\' to restart Manager.')
-        sys.exit()
+        self.need_log = False
+
+    def bds_restart(self):
+        print('>restarting...')
+        self.sent_to_all('bds', 'restart')
+        BdsLogger.put_log('bds', 'restart')
+        if subprocess.Popen.poll(self.bds) is None:
+            self.bds.stdin.write('stop\n')
+            self.bds.stdin.flush()
+        while subprocess.Popen.poll(self.bds) is None:
+            continue
+        del self.bds
+        self.bds = subprocess.Popen(
+            self.script,
+            shell=self.shell,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            universal_newlines=True,
+            encoding='utf-8'
+        )
+        # Keep the `save_log` running
+        self.need_log = True
+        self.logger = threading.Thread(target=self.save_log)
+        self.logger.start()
 
     def sent_to_all(self, msg_type: str, msg: str):
         clients = self.ws_client.copy()
@@ -86,7 +106,12 @@ class BdsCore:
 
     # Save the logs from bds to db
     def save_log(self):
+        # noinspection PyUnresolvedReferences
         for line in iter(self.bds.stdout.readline, b''):
+            if self.need_log is False:
+                return
+            if self.bds is None:
+                continue
             if subprocess.Popen.poll(self.bds) is not None:
                 self.on_stopped()
             if line != '':
@@ -98,12 +123,14 @@ class BdsCore:
     # Send commend to bds and get result
     # noinspection PyUnboundLocalVariable
     def cmd_in(self, cmd: str) -> bds_log:
-        in_time = datetime.now()
         BdsLogger.put_log('cmd_in', cmd)
+        in_time = datetime.now()
+        _log = bds_log(time=in_time, log_type='bds', log='Null')
+        if subprocess.Popen.poll(self.bds) is not None:
+            return _log
         print('>>', cmd)
         self.bds.stdin.write(cmd + '\n')
         self.bds.stdin.flush()
-        _log = bds_log(time=in_time, log_type='bds', log='Null')
         for _ in range(5):
             time.sleep(0.1)
             __log = BdsLogger.get_log_all()[-1]
