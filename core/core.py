@@ -82,6 +82,9 @@ class ManagerCore:
     def terminal_in(self):
         while True:
             in_cmd = input()
+            if in_cmd == "manager_token":
+                print(self.tokenManager.token)
+                continue
             BdsLogger.put_log('cmd_in', in_cmd)
             self.bds.sent_to_all('cmd_in', in_cmd)
             if in_cmd == 'restart':
