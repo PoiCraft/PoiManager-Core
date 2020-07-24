@@ -8,17 +8,16 @@ from flask import Flask, abort
 from flask_sockets import Sockets
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
-from geventwebsocket.websocket import WebSocket
 from werkzeug.exceptions import HTTPException
 
 from auth.Token import TokenManager
 from core.bds import BdsCore
 from database import BdsLogger
 from database.ConfigHelper import get_config
-from database.database import get_session, config, bds_log
 from loader.PropertiesLoader import PropertiesLoader
 from api.api_log import Api_Log
 from api.api_config import Api_Config
+from api.ws_cmd import Ws_Cmd
 
 
 class ManagerCore:
@@ -35,8 +34,19 @@ class ManagerCore:
         self.t_in = threading.Thread(target=self.terminal_in)
         self.app = Flask(name)
         self.socket = Sockets(self.app)
-        self.api_log = Api_Log(app=self.app, token_manager=self.tokenManager)
-        self.api_config = Api_Config(app=self.app, token_manager=self.tokenManager)
+        self.api_log = Api_Log(
+            app=self.app,
+            token_manager=self.tokenManager
+        )
+        self.api_config = Api_Config(
+            app=self.app,
+            token_manager=self.tokenManager
+        )
+        self.api_ws_cmd = Ws_Cmd(
+            bds=self.bds,
+            socket=self.socket,
+            token_manager=self.tokenManager
+        )
 
         @self.app.errorhandler(HTTPException)
         def error(e):
@@ -50,7 +60,6 @@ class ManagerCore:
             res.content_type = 'application/json'
             return res
 
-        self.route_ws()
         if self.debug:
             self.route_debug()
 
@@ -73,46 +82,6 @@ class ManagerCore:
                 self.restart_bds()
             else:
                 self.bds.cmd_in(in_cmd)
-
-    def route_web(self):
-        # Home
-        @self.app.route('/', methods=['GET', 'POST'])
-        def index():
-            return 'Hello World'
-
-    def route_ws(self):
-        # noinspection PyUnusedLocal
-        def cmd_in_via_ws(cmd_in):
-            if cmd_in is None:
-                return
-            self.bds.sent_to_all('cmd_in', cmd_in)
-            if cmd_in.split(' ')[0] in self.bds.danger_cmd:
-                self.bds.sent_to_all('bds', 'Not supported via WebSocket')
-            else:
-                result = self.bds.cmd_in(cmd_in)
-                if result.log == 'Null':
-                    self.bds.sent_to_all('bds', 'done')
-
-        @self.socket.route('/ws/cmd')
-        def cmd(ws: WebSocket):
-            ws_id = self.bds.add_ws(ws)
-            while not ws.closed:
-                message = ws.receive()
-                if message is not None:
-                    # noinspection PyBroadException
-                    msg = {'token': '', 'cmd': None}
-                    # noinspection PyBroadException
-                    try:
-                        msg = json.loads(message)
-                    except:
-                        msg['cmd'] = message
-                    if self.tokenManager.checkToken(msg.get('token', '')) or self.bds.check_ws(ws_id):
-                        result = self.bds.update_ws(ws_id)
-                        if result == 1:
-                            ws.send(json.dumps(self.tokenManager.pass_msg, ensure_ascii=False))
-                        cmd_in_via_ws(msg.get('cmd', None))
-                    else:
-                        ws.send(json.dumps(self.tokenManager.error_msg, ensure_ascii=False))
 
     def route_debug(self):
         # For debug

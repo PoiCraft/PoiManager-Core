@@ -17,6 +17,7 @@ class Api_Config(BasicApi):
 
     def get_all_config(self):
         @self.app.route('/api/config/all')
+        @self.tokenManager.require_token
         def api_get_all_config():
             session = get_session()
             _configs = session.query(config).all()
@@ -32,6 +33,7 @@ class Api_Config(BasicApi):
 
     def get_one_config(self):
         @self.app.route('/api/config/one/<key>')
+        @self.tokenManager.require_token
         def api_get_one_config(key: str):
             _c = get_config(key)
             if _c is None:
@@ -49,6 +51,7 @@ class Api_Config(BasicApi):
 
     def set_one_config(self):
         @self.app.route('/api/config/set/<key>/<value>')
+        @self.tokenManager.require_token
         def api_set_one_config(key: str, value: str):
             _c = put_config(key, value)
             return self.get_body(
