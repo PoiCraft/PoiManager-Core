@@ -15,10 +15,6 @@ from database.database import bds_log
 
 class BdsCore:
 
-    danger_cmd = [
-        'restart',
-        'stop'
-    ]
     ws_client = {}
     ws_client_len = 0
 
@@ -68,6 +64,9 @@ class BdsCore:
 
     # noinspection PyMethodMayBeStatic
     def on_stopped(self):
+        self.sent_to_all('bds', 'stopping')
+        for k in self.ws_client:
+            self.ws_client[k][0].close()
         BdsLogger.put_log('subprocess', 'stopped')
         print('>Server Stopped')
         print('>Manager Stopping...')

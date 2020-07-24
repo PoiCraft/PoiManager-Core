@@ -20,12 +20,9 @@ class Ws_Cmd:
         if cmd_in is None:
             return
         self.bds.sent_to_all('cmd_in', cmd_in)
-        if cmd_in.split(' ')[0] in self.bds.danger_cmd:
-            self.bds.sent_to_all('bds', 'Not supported via WebSocket')
-        else:
-            result = self.bds.cmd_in(cmd_in)
-            if result.log == 'Null':
-                self.bds.sent_to_all('bds', 'done')
+        result = self.bds.cmd_in(cmd_in)
+        if result.log == 'Null':
+            self.bds.sent_to_all('bds', 'done')
 
     def ws_cmd_in(self):
         @self.socket.route('/api/ws/cmd')
