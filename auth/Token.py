@@ -10,8 +10,8 @@ token_char = 'abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 class TokenManager:
 
-    error_msg = {'code': '401', 'type': 'auth', 'msg': 'Unauthorized operation'}
-    pass_msg = {'code': '200', 'type': 'auth', 'msg': 'OK'}
+    error_msg = {'code': 401, 'type': 'auth', 'msg': 'Unauthorized operation'}
+    pass_msg = {'code': 200, 'type': 'auth', 'msg': 'OK'}
 
     def __init__(self, debug=False):
         self.debug = debug
