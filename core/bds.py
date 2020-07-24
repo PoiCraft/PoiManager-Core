@@ -76,10 +76,10 @@ class BdsCore:
         print('>restarting...')
         self.sent_to_all('bds', 'restart')
         BdsLogger.put_log('bds', 'restart')
-        if subprocess.Popen.poll(self.bds) is None:
+        if self.if_alive():
             self.bds.stdin.write('stop\n')
             self.bds.stdin.flush()
-        while subprocess.Popen.poll(self.bds) is None:
+        while self.if_alive():
             continue
         del self.bds
         self.bds = subprocess.Popen(
@@ -95,12 +95,24 @@ class BdsCore:
         self.logger = threading.Thread(target=self.save_log)
         self.logger.start()
 
+    def if_alive(self):
+        if subprocess.Popen.poll(self.bds) is None:
+            return True
+        else:
+            return False
+
     def sent_to_all(self, msg_type: str, msg: str):
         clients = self.ws_client.copy()
         for k in clients:
             if not clients[k][0].closed:
                 if clients[k][1]:
-                    clients[k][0].send(json.dumps({'type': msg_type, 'msg': msg}, ensure_ascii=False))
+                    clients[k][0].send(json.dumps(
+                        {
+                            'type': msg_type,
+                            'msg': msg,
+                            'status': self.if_alive()
+                        },
+                        ensure_ascii=False))
             else:
                 del self.ws_client[k]
 
@@ -112,7 +124,7 @@ class BdsCore:
                 return
             if self.bds is None:
                 continue
-            if subprocess.Popen.poll(self.bds) is not None:
+            if not self.if_alive():
                 self.on_stopped()
             if line != '':
                 line = line.replace('\n', '')
@@ -126,7 +138,7 @@ class BdsCore:
         BdsLogger.put_log('cmd_in', cmd)
         in_time = datetime.now()
         _log = bds_log(time=in_time, log_type='bds', log='Null')
-        if subprocess.Popen.poll(self.bds) is not None:
+        if not self.if_alive():
             return _log
         print('>>', cmd)
         self.bds.stdin.write(cmd + '\n')
