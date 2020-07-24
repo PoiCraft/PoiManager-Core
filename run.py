@@ -22,6 +22,16 @@ signal.signal(signal.SIGINT, CtrlC)
 signal.signal(signal.SIGTERM, CtrlC)
 
 if __name__ == '__main__':
+
+    argv = sys.argv
+    debug = False
+    if len(argv) > 1:
+        if argv[1] == 'debug':
+            debug = True
+
+    if debug:
+        print('>Manager Debug')
+
     BdsLogger.put_log('manager', 'start')
     BdsLogger.put_log('manager', '%s:%s' % (
         get_config('web_listening_address'),
@@ -33,7 +43,7 @@ if __name__ == '__main__':
         get_config('web_listening_port')
     ))
 
-    tokenManager = TokenManager()
+    tokenManager = TokenManager(debug=debug)
     print('>Manager Token: %s' % tokenManager.token)
 
     prop_loader = PropertiesLoader()
@@ -46,5 +56,5 @@ if __name__ == '__main__':
                               bds=bdsCore,
                               prop_loader=prop_loader,
                               name=__name__,
-                              debug=True)
+                              debug=debug)
     managerCore.run()

@@ -13,8 +13,11 @@ class TokenManager:
     error_msg = {'code': '401', 'type': 'auth', 'msg': 'Unauthorized operation'}
     pass_msg = {'code': '200', 'type': 'auth', 'msg': 'OK'}
 
-    def __init__(self):
+    def __init__(self, debug=False):
+        self.debug = debug
         self.token = ''.join(random.sample(token_char, int(get_config('token_length'))))
+        if self.debug:
+            self.token = 'debug'
 
     def getToken(self):
         return self.token

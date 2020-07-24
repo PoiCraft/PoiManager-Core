@@ -28,9 +28,10 @@ class Api_Log(BasicApi):
         @self.tokenManager.require_token
         def api_log_all():
             _log = BdsLogger.get_log_all(log_type=None)
-            return self.get_body(200,
-                                 'log_all',
-                                 self.log2dict(_log)
+            return self.get_body(body_code=200,
+                                 body_type='log_all',
+                                 body_content=self.log2dict(_log),
+                                 body_msg='OK'
                                  )
 
     def log_type(self):
@@ -40,15 +41,17 @@ class Api_Log(BasicApi):
             _log = BdsLogger.get_log_all(log_type=log_type)
             if _log is None:
                 return self.get_body(
-                    404,
-                    f'log_{log_type}',
-                    None
+                    body_code=404,
+                    body_type=f'log_{log_type}',
+                    body_content=None,
+                    body_msg='No such type'
                 )
             else:
                 return self.get_body(
-                    200,
-                    f'log_{log_type}',
-                    self.log2dict(_log)
+                    body_code=200,
+                    body_type=f'log_{log_type}',
+                    body_content=self.log2dict(_log),
+                    body_msg='OK'
                 )
 
     def log_type_or_length(self):
@@ -61,21 +64,26 @@ class Api_Log(BasicApi):
                 log_type = 'all'
             if _log is None:
                 return self.get_body(
-                    404,
-                    f'log_{log_type}',
-                    _log)
+                    body_code=404,
+                    body_type=f'log_{log_type}',
+                    body_content=_log,
+                    body_msg='No such type'
+                )
             else:
                 if len(_log) < length:
                     return self.get_body(
-                        200,
-                        f'log_{log_type}',
-                        self.log2dict(_log)
+                        body_code=200,
+                        body_type=f'log_{log_type}',
+                        body_content=self.log2dict(_log),
+                        body_msg='OK'
                     )
                 else:
                     start = len(_log) - length
                     stop = len(_log)
                     print(start, stop)
-                    return self.get_body(200,
-                                         f'log_{log_type}',
-                                         self.log2dict(_log)[start:stop]
-                                         )
+                    return self.get_body(
+                        body_code=200,
+                        body_type=f'log_{log_type}',
+                        body_content=self.log2dict(_log)[start:stop],
+                        body_msg='OK'
+                    )

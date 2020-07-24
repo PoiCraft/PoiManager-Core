@@ -26,9 +26,10 @@ class Api_Config(BasicApi):
             for v in _configs:
                 configs[v.key] = v.value
             return self.get_body(
-                200,
-                'config_all',
-                configs
+                body_code=200,
+                body_type='config_all',
+                body_content=configs,
+                body_msg='OK'
             )
 
     def get_one_config(self):
@@ -38,15 +39,17 @@ class Api_Config(BasicApi):
             _c = get_config(key)
             if _c is None:
                 return self.get_body(
-                    404,
-                    f'config_get_{key}',
-                    None
+                    body_code=404,
+                    body_type=f'config_get_{key}',
+                    body_content=None,
+                    body_msg='No such key'
                 )
             else:
                 return self.get_body(
-                    200,
-                    f'config_{key}',
-                    _c
+                    body_code=200,
+                    body_type=f'config_{key}',
+                    body_content=_c,
+                    body_msg='OK'
                 )
 
     def set_one_config(self):
@@ -55,7 +58,8 @@ class Api_Config(BasicApi):
         def api_set_one_config(key: str, value: str):
             _c = put_config(key, value)
             return self.get_body(
-                200,
-                f'config_set_{key}',
-                _c
+                body_code=200,
+                body_type=f'config_set_{key}',
+                body_content=_c,
+                body_msg='OK'
             )

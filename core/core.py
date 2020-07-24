@@ -17,6 +17,7 @@ from database.ConfigHelper import get_config
 from loader.PropertiesLoader import PropertiesLoader
 from api.api_log import Api_Log
 from api.api_config import Api_Config
+from api.api_prop import Api_Prop
 from api.ws_cmd import Ws_Cmd
 
 
@@ -46,6 +47,11 @@ class ManagerCore:
             bds=self.bds,
             socket=self.socket,
             token_manager=self.tokenManager
+        )
+        self.api_prop = Api_Prop(
+            app=self.app,
+            token_manager=self.tokenManager,
+            prop_loader=self.propLoader
         )
 
         @self.app.errorhandler(HTTPException)
@@ -96,48 +102,6 @@ class ManagerCore:
                     'type': _log.log_type,
                     'log': _log.log
                     }
-
-        @self.app.route('/debug/prop')
-        def debug_prop():
-            return self.propLoader.prop
-
-        @self.app.route('/debug/prop/<key>')
-        def debug_prop_value(key):
-            value = self.propLoader.get_prop(key)
-            body = {
-                'code': 200,
-                'key': key,
-                'value': value
-            }
-            if value is None:
-                body['code'] = 404
-                body['msg'] = 'No such key'
-            return body, body['code']
-
-        @self.app.route('/debug/prop/<key>/<value>')
-        def debug_prop_edit(key, value):
-            _e = self.propLoader.edit_prop(key, value)
-            return {
-                'code': 200,
-                'prop': self.propLoader.prop,
-                'edited': _e
-            }
-
-        @self.app.route('/debug/prop/if_edited')
-        def debug_prop_if_edited():
-            return {
-                'code': 200,
-                'msg': self.propLoader.if_edited()
-            }
-
-        @self.app.route('/debug/prop/save')
-        def debug_prop_save():
-            self.propLoader.save()
-            return {
-                'code': 200,
-                'prop': self.propLoader.prop,
-                'edited': self.propLoader.if_edited()
-            }
 
     def run(self):
         self.t_in.start()
