@@ -27,3 +27,5 @@
 
 打开终端, 执行 `python3 run.py` 运行 `Manager-Core`  
 请留意输出中类似于 `>Manager Token: xxx` 的内容, 这将成为您访问 API 的凭据
+
+WEBUI页面： http://127.0.0.1:5500/
