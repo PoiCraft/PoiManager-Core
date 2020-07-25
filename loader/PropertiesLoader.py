@@ -13,9 +13,13 @@ class PropertiesLoader:
         prop_str = open(self.prop_path).read()
         self.prop = self.loadProp(prop_str)
         self.prop_old = self.exportProp(self.prop)
+        self.prop_in_file = self.exportProp(self.prop)
 
     def if_edited(self):
         return self.exportProp(self.prop) != self.prop_old
+
+    def if_saved(self):
+        return self.exportProp(self.prop) == self.prop_in_file
 
     def edit_prop(self, key: str, value: str):
         self.prop[key] = value
@@ -28,6 +32,7 @@ class PropertiesLoader:
         with open(self.prop_path, 'w') as prop:
             prop.write(self.exportProp(self.prop))
             prop.close()
+        self.prop_in_file = self.exportProp(self.prop)
 
     # noinspection PyMethodMayBeStatic
     def loadProp(self, prop_str: str) -> dict:

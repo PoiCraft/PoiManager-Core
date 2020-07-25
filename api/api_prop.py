@@ -25,7 +25,8 @@ class Api_Prop(BasicApi):
                 body_content=self.propLoader.prop,
                 body_msg='OK',
                 body_extra={
-                    'edited': self.propLoader.if_edited()
+                    'edited': self.propLoader.if_edited(),
+                    'saved': self.propLoader.if_saved()
                 }
             )
 
@@ -41,7 +42,8 @@ class Api_Prop(BasicApi):
                     body_content=None,
                     body_msg='No such prop',
                     body_extra={
-                        'edited': self.propLoader.if_edited()
+                        'edited': self.propLoader.if_edited(),
+                        'saved': self.propLoader.if_saved()
                     }
                 )
             else:
@@ -51,7 +53,8 @@ class Api_Prop(BasicApi):
                     body_content=value,
                     body_msg='OK',
                     body_extra={
-                        'edited': self.propLoader.if_edited()
+                        'edited': self.propLoader.if_edited(),
+                        'saved': self.propLoader.if_saved()
                     }
                 )
 
@@ -66,7 +69,8 @@ class Api_Prop(BasicApi):
                 body_content=self.propLoader.prop,
                 body_msg='OK',
                 body_extra={
-                    'edited': self.propLoader.if_edited()
+                    'edited': self.propLoader.if_edited(),
+                    'saved': self.propLoader.if_saved()
                 }
             )
 
@@ -81,6 +85,7 @@ class Api_Prop(BasicApi):
                 body_content=self.propLoader.prop,
                 body_msg='OK',
                 body_extra={
-                    'edited': self.propLoader.if_edited()
+                    'edited': self.propLoader.if_edited(),
+                    'saved': self.propLoader.if_saved()
                 }
             )
