@@ -1,6 +1,8 @@
 import signal
 import sys
 
+from flask import Flask
+
 from auth.Token import TokenManager
 from core.bds import BdsCore
 from core.core import ManagerCore
@@ -46,6 +48,13 @@ if __name__ == '__main__':
     tokenManager = TokenManager(debug=debug)
     print('>Manager Token: %s' % tokenManager.token)
 
+    app = Flask(
+            __name__,
+            static_url_path='/',
+            static_folder='static',
+            template_folder='template'
+        )
+
     prop_loader = PropertiesLoader()
     bdsCore = BdsCore()
 
@@ -56,5 +65,6 @@ if __name__ == '__main__':
                               bds=bdsCore,
                               prop_loader=prop_loader,
                               name=__name__,
+                              app=app,
                               debug=debug)
     managerCore.run()

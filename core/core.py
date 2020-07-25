@@ -1,7 +1,7 @@
 import json
 import threading
 
-from flask import Flask, abort
+from flask import Flask, abort, render_template
 from flask_sockets import Sockets
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
@@ -19,6 +19,7 @@ from api.ws_cmd import Ws_Cmd
 
 class ManagerCore:
     def __init__(self,
+                 app: Flask,
                  token_manager: TokenManager,
                  prop_loader: PropertiesLoader,
                  bds: BdsCore,
@@ -29,7 +30,7 @@ class ManagerCore:
         self.tokenManager = token_manager
         self.propLoader = prop_loader
         self.t_in = threading.Thread(target=self.terminal_in)
-        self.app = Flask(name)
+        self.app = app
         self.socket = Sockets(self.app)
         self.api_log = Api_Log(
             app=self.app,
@@ -61,6 +62,10 @@ class ManagerCore:
             })
             res.content_type = 'application/json'
             return res
+
+        @self.app.route('/')
+        def index():
+            return render_template('index.html')
 
         if self.debug:
             self.route_debug()
