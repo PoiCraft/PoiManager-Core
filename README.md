@@ -20,7 +20,7 @@
 ### 二、配置
 
 打开终端, 执行 `pip3 install -r requirement.txt` 安装依赖  
-依赖安装完成后执行 `python3 init_db.py` 初始化数据库, 您可在这一步修改部分配置, 但大多数情况下这是不必要的.  
+依赖安装完成后执行 `python3 db_init.py` 初始化数据库, 您可在这一步修改部分配置, 但大多数情况下这是不必要的.  
 新建文件夹 `bedrock_core`, 并将您下载的 Bedrock Server 放入此文件夹  
 
 ### 三、使用
