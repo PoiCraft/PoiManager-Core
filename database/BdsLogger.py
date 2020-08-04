@@ -21,6 +21,7 @@ def get_log_all(log_type='bds'):
 
 
 def put_log(log_type: str, value: str) -> None:
+    print(f'Log: {log_type} > {value}')
     session = get_session()
     _c = bds_log(time=datetime.now(), log=value, log_type=log_type)
     session.add(_c)

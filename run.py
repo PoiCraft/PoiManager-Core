@@ -1,3 +1,4 @@
+import os
 import signal
 import sys
 
@@ -12,6 +13,9 @@ from loader.PropertiesLoader import PropertiesLoader
 
 
 # noinspection PyUnusedLocal
+from utils.init import init_db
+
+
 def CtrlC(*args):
     print('>stopped<')
     BdsLogger.put_log('manager', 'stop_done')
@@ -25,11 +29,19 @@ signal.signal(signal.SIGTERM, CtrlC)
 
 if __name__ == '__main__':
 
+    if os.path.isfile('db.sqlite3') is not True:
+        print('Database is missing, creating...')
+        init_db()
+
     argv = sys.argv
     debug = False
+    debug_no_bds = False
     if len(argv) > 1:
         if argv[1] == 'debug':
             debug = True
+        elif argv[1] == 'debug-no-bds':
+            debug = True
+            debug_no_bds = True
 
     if debug:
         print('>Manager Debug')
@@ -55,8 +67,9 @@ if __name__ == '__main__':
             template_folder='template'
         )
 
-    prop_loader = PropertiesLoader()
-    bdsCore = BdsCore()
+    prop_loader = PropertiesLoader(no_bds=debug_no_bds)
+
+    bdsCore = BdsCore(no_bds=debug_no_bds)
 
     if get_config('clear_log_on_start') == 'true':
         BdsLogger.clear_log()

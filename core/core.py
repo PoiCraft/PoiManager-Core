@@ -34,7 +34,8 @@ class ManagerCore:
         self.socket = Sockets(self.app)
         self.api_log = Api_Log(
             app=self.app,
-            token_manager=self.tokenManager
+            token_manager=self.tokenManager,
+            bds=self.bds
         )
         self.api_config = Api_Config(
             app=self.app,

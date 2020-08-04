@@ -75,7 +75,7 @@ def print_and_edit():
     print('Enter 0 to Exit')
     key_index = input('Enter the number before the config you want to edit: ')
     if key_index == '0':
-        sys.exit()
+        return
     try:
         _key = configs_keys[int(key_index) - 1]
         _value = input('Then enter the value: ')

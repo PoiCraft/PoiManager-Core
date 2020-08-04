@@ -2,16 +2,19 @@ from flask import Flask
 
 from api.api import BasicApi
 from auth.Token import TokenManager
+from core.bds import BdsCore
 from database import BdsLogger
 
 
 class Api_Log(BasicApi):
-    def __init__(self, app: Flask, token_manager: TokenManager):
+    def __init__(self, app: Flask, token_manager: TokenManager, bds: BdsCore):
         self.app = app
         self.tokenManager = token_manager
+        self.bds = bds
         self.log_all()
         self.log_type()
         self.log_type_or_length()
+        self.log_put()
 
     # noinspection PyMethodMayBeStatic
     def log2dict(self, log_list):
@@ -22,6 +25,19 @@ class Api_Log(BasicApi):
                               'log': _log.log
                               })
         return _log_list
+
+    def log_put(self):
+        @self.app.route('/api/log/put/<log_type>/<value>')
+        @self.tokenManager.require_token
+        def api_log_put(log_type: str, value: str):
+            BdsLogger.put_log(log_type, value)
+            self.bds.sent_to_all(log_type, value)
+            return self.get_body(
+                body_code=200,
+                body_type='log_put',
+                body_msg='OK',
+                body_content='OK'
+            )
 
     def log_all(self):
         @self.app.route('/api/log/all')

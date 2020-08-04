@@ -5,12 +5,15 @@ from database.ConfigHelper import get_config
 
 class PropertiesLoader:
 
-    def __init__(self):
+    def __init__(self, no_bds=False):
         self.prop_path = os.path.join(
             get_config('bedrock_server_root'),
             get_config('bedrock_server_properties')
         )
-        prop_str = open(self.prop_path).read()
+        if no_bds:
+            prop_str = ''
+        else:
+            prop_str = open(self.prop_path).read()
         self.prop = self.loadProp(prop_str)
         self.prop_old = self.exportProp(self.prop)
         self.prop_in_file = self.exportProp(self.prop)
