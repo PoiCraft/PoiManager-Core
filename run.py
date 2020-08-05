@@ -1,3 +1,9 @@
+""" The script to run PoiManager-Core.
+
+Use ` python3 run.py` to run this.
+
+"""
+
 import os
 import signal
 import sys

@@ -4,6 +4,7 @@ import threading
 from flask import Flask, abort, render_template
 from flask_sockets import Sockets
 from gevent.pywsgi import WSGIServer
+# noinspection PyPackageRequirements
 from geventwebsocket.handler import WebSocketHandler
 from werkzeug.exceptions import HTTPException
 
@@ -18,6 +19,7 @@ from api.ws_cmd import Ws_Cmd
 
 
 class ManagerCore:
+    # noinspection PyUnusedLocal
     def __init__(self,
                  app: Flask,
                  token_manager: TokenManager,

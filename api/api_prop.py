@@ -6,6 +6,7 @@ from loader.PropertiesLoader import PropertiesLoader
 
 
 class Api_Prop(BasicApi):
+    """The class of the API for the properties of bedrock server."""
     def __init__(self, app: Flask, token_manager: TokenManager, prop_loader: PropertiesLoader):
         self.app = app
         self.tokenManager = token_manager

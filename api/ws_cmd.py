@@ -1,6 +1,7 @@
 import json
 
 from flask_sockets import Sockets
+# noinspection PyPackageRequirements
 from geventwebsocket.websocket import WebSocket
 
 from auth.Token import TokenManager
@@ -8,6 +9,7 @@ from core.bds import BdsCore
 
 
 class Ws_Cmd:
+    """A class that provide a WebSocket Interface to send commands and receive logs from Manager"""
 
     def __init__(self, bds: BdsCore, socket: Sockets, token_manager: TokenManager):
         self.socket = socket

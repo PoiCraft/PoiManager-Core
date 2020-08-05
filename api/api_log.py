@@ -7,6 +7,7 @@ from database import BdsLogger
 
 
 class Api_Log(BasicApi):
+    """The class of the API for logs."""
     def __init__(self, app: Flask, token_manager: TokenManager, bds: BdsCore):
         self.app = app
         self.tokenManager = token_manager

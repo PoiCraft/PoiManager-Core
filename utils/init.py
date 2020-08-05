@@ -3,6 +3,8 @@ from database.database import create_db
 
 
 def init_db():
+    """A function to create a database.
+    """
     print('Creating database...')
     create_db()
     print('>>done')

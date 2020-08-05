@@ -1,3 +1,4 @@
+cffi==1.14.1
 click==7.1.2
 Flask==1.1.2
 Flask-Sockets==0.2.1
@@ -7,6 +8,7 @@ greenlet==0.4.16
 itsdangerous==1.1.0
 Jinja2==2.11.2
 MarkupSafe==1.1.1
+pycparser==2.20
 python-engineio==3.13.1
 python-socketio==4.6.0
 six==1.15.0
