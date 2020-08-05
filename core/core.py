@@ -8,6 +8,7 @@ from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
 from werkzeug.exceptions import HTTPException
 
+from api.api_cmd import Api_Cmd
 from auth.Token import TokenManager
 from core.bds import BdsCore
 from database.ConfigHelper import get_config
@@ -52,6 +53,11 @@ class ManagerCore:
             app=self.app,
             token_manager=self.tokenManager,
             prop_loader=self.propLoader
+        )
+        self.api_cmd = Api_Cmd(
+            app=self.app,
+            bds=self.bds,
+            token_manager=self.tokenManager
         )
 
         @self.app.errorhandler(HTTPException)
