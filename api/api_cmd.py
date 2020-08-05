@@ -32,7 +32,7 @@ class Api_Cmd(BasicApi):
                 _log = BdsLogger.get_log_all(log_type='bds')[-1]
                 if _log.time < cmd_in_time:
                     if_wait -= 1
-                if (datetime.now() - cmd_in_time).seconds > 1:
+                if (datetime.now() - cmd_in_time).seconds > 2.5:
                     break
                 time.sleep(0.2)
 
