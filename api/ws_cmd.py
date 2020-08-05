@@ -25,9 +25,7 @@ class Ws_Cmd:
         if cmd_in == 'restart':
             self.bds.bds_restart()
             return
-        result = self.bds.cmd_in(cmd_in)
-        if result.log == 'Null':
-            self.bds.sent_to_all('bds', 'done')
+        self.bds.cmd_in(cmd_in)
 
     def ws_cmd_in(self):
         @self.socket.route('/api/ws/cmd')

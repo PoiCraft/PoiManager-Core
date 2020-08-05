@@ -139,7 +139,7 @@ class BdsCore:
 
     # Send commend to bds and get result
     # noinspection PyUnboundLocalVariable
-    def cmd_in(self, cmd: str) -> bds_log:
+    def cmd_in(self, cmd: str):
         BdsLogger.put_log('cmd_in', cmd)
         in_time = datetime.now()
         _log = bds_log(time=in_time, log_type='bds', log='Null')
@@ -148,10 +148,3 @@ class BdsCore:
         print('>>', cmd)
         self.bds.stdin.write(cmd + '\n')
         self.bds.stdin.flush()
-        for _ in range(5):
-            time.sleep(0.1)
-            __log = BdsLogger.get_log_all()[-1]
-            if __log.time > in_time:
-                _log = __log
-                break
-        return _log

@@ -94,14 +94,6 @@ class ManagerCore:
         def debug_err(code: int):
             abort(code)
 
-        @self.app.route('/debug/cmd/<cmd_in>')
-        def debug_cmd(cmd_in):
-            _log = self.bds.cmd_in(cmd_in)
-            return {'time': _log.time,
-                    'type': _log.log_type,
-                    'log': _log.log
-                    }
-
     def run(self):
         self.t_in.start()
         if self.debug:
