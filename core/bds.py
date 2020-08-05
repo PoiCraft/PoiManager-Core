@@ -135,7 +135,6 @@ class BdsCore:
                 line = line.replace('\n', '')
                 self.sent_to_all('bds', line)
                 BdsLogger.put_log('bds', line)
-                print(line)
 
     # Send commend to bds and get result
     # noinspection PyUnboundLocalVariable
