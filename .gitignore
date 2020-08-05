@@ -4,3 +4,4 @@ db.sqlite3-journal
 bedrock_server
 .idea
 __*
+.token

@@ -19,7 +19,8 @@ default = dict(
     web_listening_address='127.0.0.1',
     web_listening_port='5500',
     token_length='32',
-    clear_log_on_start='true'
+    clear_log_on_start='true',
+    use_the_same_token='false'
 )
 
 
@@ -61,16 +62,13 @@ def init():
 
 # noinspection PyBroadException
 def print_and_edit():
-    session = get_session()
-    _configs = session.query(config).all()
-    session.close()
     configs_keys = []
-    for v in _configs:
-        configs_keys.append(v.key)
+    for v in default:
+        configs_keys.append(v)
         print('%s %s=%s' % (
             len(configs_keys),
-            v.key,
-            v.value
+            v,
+            get_config(v)
         ))
     print('Enter 0 to Exit')
     key_index = input('Enter the number before the config you want to edit: ')

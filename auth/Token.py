@@ -1,3 +1,4 @@
+import os
 import random
 from functools import wraps
 
@@ -16,6 +17,13 @@ class TokenManager:
     def __init__(self, debug=False):
         self.debug = debug
         self.token = ''.join(random.sample(token_char, int(get_config('token_length'))))
+        if get_config('use_the_same_token') == 'true':
+            if os.path.isfile('.token'):
+                self.token = open('.token').read()
+            else:
+                with open('.token', 'w') as f:
+                    f.write(self.token)
+                    f.close()
         if self.debug:
             self.token = 'debug'
 
