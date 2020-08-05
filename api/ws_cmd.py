@@ -6,6 +6,7 @@ from geventwebsocket.websocket import WebSocket
 
 from auth.Token import TokenManager
 from core.bds import BdsCore
+from database import BdsLogger
 
 
 class Ws_Cmd:
@@ -41,6 +42,8 @@ class Ws_Cmd:
                         msg = json.loads(message)
                     except:
                         msg['cmd'] = message
+                    if (msg.get('type', None) is not None) and (msg.get('msg', None) is not None):
+                        BdsLogger.put_log(msg['type'], msg['msg'])
                     if self.tokenManager.checkToken(msg.get('token', '')) or self.bds.check_ws(ws_id):
                         result = self.bds.update_ws(ws_id)
                         if result == 1:
