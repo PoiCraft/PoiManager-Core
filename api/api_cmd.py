@@ -20,12 +20,12 @@ class Api_Cmd(BasicApi):
     def cmd_in(self):
         @self.app.route('/api/cmd/<cmd>/<int:timeout>')
         @self.app.route('/api/cmd/<cmd>')
-        @self.app.route('/api/cmd/<cmd>/')
         @self.tokenManager.require_token
         def api_cmd_in(cmd: str, timeout=None):
             cmd_in_time = datetime.now()
             logs = []
 
+            self.bds.sent_to_all('cmd_in', cmd)
             self.bds.cmd_in(cmd)
 
             time.sleep(0.3)
