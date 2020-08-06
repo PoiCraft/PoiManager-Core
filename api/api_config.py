@@ -2,6 +2,7 @@ from flask import Flask
 
 from api.api import BasicApi
 from auth.Token import TokenManager
+from database.BdsLogger import write_log
 from database.ConfigHelper import get_config, put_config
 from database.database import get_session, config
 
@@ -19,6 +20,7 @@ class Api_Config(BasicApi):
     def get_all_config(self):
         @self.app.route('/api/config/all')
         @self.tokenManager.require_token
+        @write_log
         def api_get_all_config():
             session = get_session()
             _configs = session.query(config).all()
@@ -36,6 +38,7 @@ class Api_Config(BasicApi):
     def get_one_config(self):
         @self.app.route('/api/config/one/<key>')
         @self.tokenManager.require_token
+        @write_log
         def api_get_one_config(key: str):
             _c = get_config(key)
             if _c is None:
@@ -56,6 +59,7 @@ class Api_Config(BasicApi):
     def set_one_config(self):
         @self.app.route('/api/config/set/<key>/<value>')
         @self.tokenManager.require_token
+        @write_log
         def api_set_one_config(key: str, value: str):
             _c = put_config(key, value)
             return self.get_body(

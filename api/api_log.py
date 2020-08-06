@@ -4,6 +4,7 @@ from api.api import BasicApi
 from auth.Token import TokenManager
 from core.bds import BdsCore
 from database import BdsLogger
+from database.BdsLogger import write_log
 
 
 class Api_Log(BasicApi):
@@ -30,6 +31,7 @@ class Api_Log(BasicApi):
     def log_put(self):
         @self.app.route('/api/log/put/<log_type>/<value>')
         @self.tokenManager.require_token
+        @write_log
         def api_log_put(log_type: str, value: str):
             BdsLogger.put_log(log_type, value)
             self.bds.sent_to_all(log_type, value)
@@ -43,6 +45,7 @@ class Api_Log(BasicApi):
     def log_all(self):
         @self.app.route('/api/log/all')
         @self.tokenManager.require_token
+        @write_log
         def api_log_all():
             _log = BdsLogger.get_log_all(log_type=None)
             return self.get_body(body_code=200,
@@ -54,6 +57,7 @@ class Api_Log(BasicApi):
     def log_type(self):
         @self.app.route('/api/log/type/<log_type>')
         @self.tokenManager.require_token
+        @write_log
         def api_log_type(log_type: str):
             _log = BdsLogger.get_log_all(log_type=log_type)
             if _log is None:
@@ -75,6 +79,7 @@ class Api_Log(BasicApi):
         @self.app.route('/api/log/all/<int:length>')
         @self.app.route('/api/log/type/<log_type>/<int:length>')
         @self.tokenManager.require_token
+        @write_log
         def api_log_type_or_length(length, log_type=None):
             _log = BdsLogger.get_log_all(log_type=log_type)
             if log_type is None:

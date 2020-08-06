@@ -1,4 +1,7 @@
 from datetime import datetime
+from functools import wraps
+
+from flask import request
 
 from database.database import get_session, bds_log
 
@@ -34,3 +37,15 @@ def clear_log():
     _c = session.query(bds_log).delete()
     session.commit()
     session.close()
+
+
+def write_log(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        log_type = request.args.get('type', None)
+        log = request.args.get('msg', None)
+        if (log_type is not None) and (log is not None):
+            put_log(log_type, log)
+        return func(*args, **kwargs)
+
+    return wrapper

@@ -2,6 +2,7 @@ from flask import Flask
 
 from api.api import BasicApi
 from auth.Token import TokenManager
+from database.BdsLogger import write_log
 from loader.PropertiesLoader import PropertiesLoader
 
 
@@ -19,6 +20,7 @@ class Api_Prop(BasicApi):
     def prop_all(self):
         @self.app.route('/api/prop/all')
         @self.tokenManager.require_token
+        @write_log
         def api_prop_all():
             return self.get_body(
                 body_code=200,
@@ -34,6 +36,7 @@ class Api_Prop(BasicApi):
     def prop_one(self):
         @self.app.route('/api/prop/one/<key>')
         @self.tokenManager.require_token
+        @write_log
         def api_prop_one(key):
             value = self.propLoader.get_prop(key)
             if value is None:
@@ -62,6 +65,7 @@ class Api_Prop(BasicApi):
     def prop_one_set(self):
         @self.app.route('/api/prop/set/<key>/<value>')
         @self.tokenManager.require_token
+        @write_log
         def api_prop_set_one(key, value):
             _e = self.propLoader.edit_prop(key, value)
             return self.get_body(
@@ -78,6 +82,7 @@ class Api_Prop(BasicApi):
     def prop_save(self):
         @self.app.route('/api/prop/save')
         @self.tokenManager.require_token
+        @write_log
         def api_prop_save():
             self.propLoader.save()
             return self.get_body(

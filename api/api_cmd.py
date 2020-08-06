@@ -7,6 +7,7 @@ from core.bds import BdsCore
 from datetime import datetime
 
 from database import BdsLogger
+from database.BdsLogger import write_log
 from database.database import get_session
 
 
@@ -21,6 +22,7 @@ class Api_Cmd(BasicApi):
         @self.app.route('/api/cmd/<cmd>/<int:timeout>')
         @self.app.route('/api/cmd/<cmd>')
         @self.tokenManager.require_token
+        @write_log
         def api_cmd_in(cmd: str, timeout=None):
             cmd_in_time = datetime.now()
             logs = []
