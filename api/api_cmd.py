@@ -51,16 +51,19 @@ class Api_Cmd(BasicApi):
                     index = -1
                     _n = True
                     while _n:
-                        _log = BdsLogger.get_log_all('bds')[index]
+                        ___logs = BdsLogger.get_log_all('result')
+                        if len(___logs) < -index:
+                            _n = False
+                        _log = ___logs[index]
                         if _log.time >= cmd_in_time:
                             __logs.append(_log)
                             index -= 1
                         else:
                             _n = False
-                    if len(__logs) == line:
+                    if len(__logs) >= line:
                         _logs = __logs
                         break
-                    if (datetime.now() - cmd_in_time).seconds > 5:
+                    if (datetime.now() - cmd_in_time).seconds >= 3:
                         _logs = __logs
                         break
 

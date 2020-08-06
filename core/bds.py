@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import subprocess
 import sys
 import threading
@@ -133,8 +134,12 @@ class BdsCore:
                 self.on_stopped()
             if line != '':
                 line = line.replace('\n', '')
-                self.sent_to_all('bds', line)
-                BdsLogger.put_log('bds', line)
+                if re.match(r'\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', line):
+                    self.sent_to_all('bds', line)
+                    BdsLogger.put_log('bds', line)
+                else:
+                    self.sent_to_all('result', line)
+                    BdsLogger.put_log('result', line)
 
     # Send commend to bds and get result
     # noinspection PyUnboundLocalVariable
