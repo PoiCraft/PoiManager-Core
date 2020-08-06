@@ -42,7 +42,8 @@ class ManagerCore:
         )
         self.api_config = Api_Config(
             app=self.app,
-            token_manager=self.tokenManager
+            token_manager=self.tokenManager,
+            bds=self.bds
         )
         self.api_ws_cmd = Ws_Cmd(
             bds=self.bds,
@@ -52,7 +53,8 @@ class ManagerCore:
         self.api_prop = Api_Prop(
             app=self.app,
             token_manager=self.tokenManager,
-            prop_loader=self.propLoader
+            prop_loader=self.propLoader,
+            bds=self.bds
         )
         self.api_cmd = Api_Cmd(
             app=self.app,

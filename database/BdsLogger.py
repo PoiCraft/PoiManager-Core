@@ -39,13 +39,16 @@ def clear_log():
     session.close()
 
 
-def write_log(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        log_type = request.args.get('type', None)
-        log = request.args.get('msg', None)
-        if (log_type is not None) and (log is not None):
-            put_log(log_type, log)
-        return func(*args, **kwargs)
+def write_log(bds):
+    def log_decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            log_type = request.args.get('type', None)
+            log = request.args.get('msg', None)
+            if (log_type is not None) and (log is not None):
+                put_log(log_type, log)
+                bds.sent_to_all(log_type, log)
+            return func(*args, **kwargs)
 
-    return wrapper
+        return wrapper
+    return log_decorator
