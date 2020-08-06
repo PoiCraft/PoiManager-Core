@@ -33,6 +33,7 @@ class Api_Cmd(BasicApi):
             _logs = []
 
             line = request.args.get('line', None)
+
             if line is None:
                 time.sleep(0.3)
                 if timeout:
@@ -40,7 +41,7 @@ class Api_Cmd(BasicApi):
 
                 index = -1
                 while True:
-                    _log = BdsLogger.get_log_all('bds')[index]
+                    _log = BdsLogger.get_log_all('result')[index]
                     if _log.time >= cmd_in_time:
                         _logs.append(_log)
                         index -= 1
