@@ -18,23 +18,20 @@ class Api_Cmd(BasicApi):
         self.cmd_in()
 
     def cmd_in(self):
+        @self.app.route('/api/cmd/<cmd>/<int:timeout>')
         @self.app.route('/api/cmd/<cmd>')
+        @self.app.route('/api/cmd/<cmd>/')
         @self.tokenManager.require_token
-        def api_cmd_in(cmd: str):
+        def api_cmd_in(cmd: str, timeout=None):
             cmd_in_time = datetime.now()
             logs = []
 
             self.bds.cmd_in(cmd)
 
-            if_wait = 0
-            while if_wait < 5:
-                if_wait += 1
-                _log = BdsLogger.get_log_all(log_type='bds')[-1]
-                if _log.time < cmd_in_time:
-                    if_wait -= 1
-                if (datetime.now() - cmd_in_time).seconds > 2.5:
-                    break
-                time.sleep(0.2)
+            time.sleep(0.3)
+
+            if timeout:
+                time.sleep(timeout)
 
             _logs = []
             index = -1
