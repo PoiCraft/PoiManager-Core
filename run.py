@@ -25,7 +25,8 @@ from utils.init import init_db
 def CtrlC(*args):
     print('>stopped<')
     BdsLogger.put_log('manager', 'stop_done')
-    sys.exit()
+    while True:
+        sys.exit()
 
 
 # noinspection PyTypeChecker
