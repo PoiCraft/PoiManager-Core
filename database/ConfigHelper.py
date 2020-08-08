@@ -32,7 +32,7 @@ def get_config(key: str):
         _c = config(key=key, value=default[key])
         session.add(_c)
         session.commit()
-    _c = session.merge(_c)
+        return get_config(key)
     session.close()
     if _c is None:
         return None
@@ -83,3 +83,14 @@ def print_and_edit():
     except:
         print('Failed!')
     print_and_edit()
+
+
+def printConfig():
+    configs_keys = []
+    for v in default:
+        configs_keys.append(v)
+        print('%s %s=%s' % (
+            len(configs_keys),
+            v,
+            get_config(v)
+        ))

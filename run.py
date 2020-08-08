@@ -14,7 +14,7 @@ from auth.Token import TokenManager
 from core.bds import BdsCore
 from core.core import ManagerCore
 from database import BdsLogger
-from database.ConfigHelper import get_config
+from database.ConfigHelper import get_config, printConfig
 from loader.PropertiesLoader import PropertiesLoader
 
 
@@ -36,6 +36,8 @@ signal.signal(signal.SIGTERM, CtrlC)
 
 if __name__ == '__main__':
 
+    print('>PoiManager-Core starting...')
+
     if os.path.isfile('db.sqlite3') is not True:
         print('Database is missing, creating...')
         init_db()
@@ -52,6 +54,9 @@ if __name__ == '__main__':
 
     if debug:
         print('>Manager Debug')
+
+    print('>Configs are:')
+    printConfig()
 
     BdsLogger.put_log('manager', 'start')
     BdsLogger.put_log('manager', '%s:%s' % (
