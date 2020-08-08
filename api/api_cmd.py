@@ -8,7 +8,6 @@ from datetime import datetime
 
 from database import BdsLogger
 from database.BdsLogger import write_log
-from database.database import get_session
 
 
 class Api_Cmd(BasicApi):

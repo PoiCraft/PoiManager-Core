@@ -89,7 +89,7 @@ class Api_Prop(BasicApi):
             self.propLoader.save()
             return self.get_body(
                 body_code=200,
-                body_type=f'prop_save',
+                body_type='prop_save',
                 body_content=self.propLoader.prop,
                 body_msg='OK',
                 body_extra={
