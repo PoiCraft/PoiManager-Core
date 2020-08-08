@@ -23,13 +23,16 @@ def get_log_all(log_type='bds'):
     return _c
 
 
-def put_log(log_type: str, value: str) -> None:
+def put_log(log_type: str, value: str, ignore=False):
     session = get_session()
-    _c = bds_log(time=datetime.now(), log=value, log_type=log_type)
+    if ignore:
+        value = '(ignore) '+value
+    else:
+        _c = bds_log(time=datetime.now(), log=value, log_type=log_type)
+        session.add(_c)
+        session.commit()
+        session.close()
     print(f'{log_type} > {value}')
-    session.add(_c)
-    session.commit()
-    session.close()
 
 
 def clear_log():

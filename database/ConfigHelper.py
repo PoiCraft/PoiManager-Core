@@ -20,7 +20,8 @@ default = dict(
     web_listening_port='5500',
     token_length='32',
     clear_log_on_start='true',
-    use_the_same_token='false'
+    use_the_same_token='false',
+    ignore_auto_compaction='true'
 )
 
 
@@ -31,6 +32,7 @@ def get_config(key: str):
         _c = config(key=key, value=default[key])
         session.add(_c)
         session.commit()
+    _c = session.merge(_c)
     session.close()
     if _c is None:
         return None

@@ -107,7 +107,9 @@ class BdsCore:
         else:
             return False
 
-    def sent_to_all(self, msg_type: str, msg: str):
+    def sent_to_all(self, msg_type: str, msg: str, ignore=False):
+        if ignore:
+            msg = '(ignore) ' + msg
         clients = self.ws_client.copy()
         for k in clients:
             if not clients[k][0].closed:
@@ -135,8 +137,12 @@ class BdsCore:
             if line != '':
                 line = line.replace('\n', '')
                 if re.match(r'\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', line):
-                    self.sent_to_all('bds', line)
-                    BdsLogger.put_log('bds', line)
+                    if ('Running AutoCompaction...' in line) and (get_config('ignore_auto_compaction') == 'true'):
+                        self.sent_to_all('bds', line, ignore=True)
+                        BdsLogger.put_log('bds', line, ignore=True)
+                    else:
+                        self.sent_to_all('bds', line)
+                        BdsLogger.put_log('bds', line)
                 else:
                     self.sent_to_all('result', line)
                     BdsLogger.put_log('result', line)
