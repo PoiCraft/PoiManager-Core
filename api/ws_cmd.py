@@ -10,6 +10,7 @@ from database import BdsLogger
 
 
 class Ws_Cmd:
+
     """A class that provide a WebSocket Interface to send commands and receive logs from Manager"""
 
     def __init__(self, bds: BdsCore, socket: Sockets, token_manager: TokenManager):

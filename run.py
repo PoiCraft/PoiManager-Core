@@ -1,4 +1,4 @@
-""" The script to run PoiManager-Core.
+"""The script to run PoiManager-Core.
 
 Use ` python3 run.py` to run this.
 

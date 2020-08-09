@@ -37,7 +37,7 @@ def put_log(log_type: str, value: str, ignore=False):
 
 def clear_log():
     session = get_session()
-    _c = session.query(bds_log).delete()
+    session.query(bds_log).delete()
     session.commit()
     session.close()
 

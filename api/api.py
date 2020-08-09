@@ -1,4 +1,5 @@
 class BasicApi:
+
     """Basic Api
 
     It has a function that can build a formatted JSON as body.
@@ -6,7 +7,7 @@ class BasicApi:
 
     # noinspection PyMethodMayBeStatic
     def get_body(self, body_code, body_type, body_msg, body_content, body_extra=None):
-        """ A function to build a formatted JSON as body.
+        """A function to build a formatted JSON as body.
 
         This function will build a body kile {
                    'code': body_code,

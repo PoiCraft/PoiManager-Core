@@ -9,6 +9,7 @@ from database.database import get_session, config
 
 
 class Api_Config(BasicApi):
+
     """The class of the API for Manager's configs."""
 
     def __init__(self, app: Flask, token_manager: TokenManager, bds: BdsCore):
