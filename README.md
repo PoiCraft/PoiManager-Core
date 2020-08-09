@@ -6,11 +6,11 @@
 
 本程序需要以下环境:
 
-*  Python3
-*  pip3
-*  Git
-*  良好的网络
-*  Bedrock Server (原生或其他)
+* Python3
+* pip3
+* Git
+* 良好的网络
+* Bedrock Server (原生或其他)
 
 ### 一、获取
 
