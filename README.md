@@ -1,5 +1,7 @@
 # PoiManager-Core
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/de49f8943662401a9a7f0727cad83027)](https://app.codacy.com/gh/PoiCraft/PoiManager-Core?utm_source=github.com&utm_medium=referral&utm_content=PoiCraft/PoiManager-Core&utm_campaign=Badge_Grade_Dashboard)
+
 一个给予 Bedrock Server 一些 API 的简易程序
 
 ## 安装 
