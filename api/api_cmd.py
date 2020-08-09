@@ -8,6 +8,7 @@ from datetime import datetime
 
 from database import BdsLogger
 from database.BdsLogger import write_log
+from database.database import get_session, bds_log
 
 
 class Api_Cmd(BasicApi):
@@ -26,8 +27,10 @@ class Api_Cmd(BasicApi):
             cmd_in_time = datetime.now()
             logs = []
 
-            self.bds.sent_to_all('cmd_in', cmd)
-            self.bds.cmd_in(cmd)
+            ignore = request.args.get('ignore', None) == 'true'
+
+            self.bds.sent_to_all('cmd_in', cmd, ignore=ignore)
+            self.bds.cmd_in(cmd, ignore=ignore)
 
             _logs = []
 
@@ -68,6 +71,14 @@ class Api_Cmd(BasicApi):
                     if (datetime.now() - cmd_in_time).seconds >= 3:
                         _logs = __logs
                         break
+
+            if ignore:
+                session = get_session()
+                for v in _logs:
+                    session.delete(session.query(bds_log).get(v.time))
+                _l = f'The {len(_logs)} lines of log above has been removed from db.'
+                self.bds.sent_to_all('cmd_log', _l, ignore=True)
+                BdsLogger.put_log('cmd_log', _l, ignore=True)
 
             for i in range(len(_logs)):
                 logs.append(
