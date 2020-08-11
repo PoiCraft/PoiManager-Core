@@ -19,11 +19,10 @@ class Api_Cmd(BasicApi):
         self.cmd_in()
 
     def cmd_in(self):
-        @self.app.route('/api/cmd/<cmd>/<int:timeout>')
         @self.app.route('/api/cmd/<cmd>')
         @self.tokenManager.require_token
         @write_log(self.bds)
-        def api_cmd_in(cmd: str, timeout=None):
+        def api_cmd_in(cmd: str):
             cmd_in_time = datetime.now()
             logs = []
 
@@ -37,18 +36,14 @@ class Api_Cmd(BasicApi):
             wait_sec = int(request.args.get('timeout', 3))
 
             if line is None:
-                time.sleep(0.3)
-                if timeout:
-                    time.sleep(timeout)
 
-                index = -1
-                while True:
-                    _log = BdsLogger.get_log_all('result')[index]
-                    if _log.time >= cmd_in_time:
-                        _logs.append(_log)
-                        index -= 1
-                    else:
-                        break
+                return self.get_body(
+                    body_code=400,
+                    body_type='cmd_log',
+                    body_msg='Error, missing "line"',
+                    body_content=None
+                )
+
             else:
                 line = int(line)
                 while True:
@@ -69,6 +64,8 @@ class Api_Cmd(BasicApi):
                     if len(__logs) >= line:
                         _logs = __logs
                         break
+                    if wait_sec == 0:
+                        continue
                     if (datetime.now() - cmd_in_time).seconds >= wait_sec:
                         _logs = __logs
                         break
