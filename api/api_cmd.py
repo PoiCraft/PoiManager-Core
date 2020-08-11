@@ -29,12 +29,12 @@ class Api_Cmd(BasicApi):
 
             ignore = request.args.get('ignore', None) == 'true'
 
-            self.bds.sent_to_all('cmd_in', cmd, ignore=ignore)
             self.bds.cmd_in(cmd, ignore=ignore)
 
             _logs = []
 
             line = request.args.get('line', None)
+            wait_sec = int(request.args.get('timeout', 3))
 
             if line is None:
                 time.sleep(0.3)
@@ -59,6 +59,7 @@ class Api_Cmd(BasicApi):
                         ___logs = BdsLogger.get_log_all('result')
                         if len(___logs) < -index:
                             _n = False
+                            continue
                         _log = ___logs[index]
                         if _log.time >= cmd_in_time:
                             __logs.append(_log)
@@ -68,7 +69,7 @@ class Api_Cmd(BasicApi):
                     if len(__logs) >= line:
                         _logs = __logs
                         break
-                    if (datetime.now() - cmd_in_time).seconds >= 3:
+                    if (datetime.now() - cmd_in_time).seconds >= wait_sec:
                         _logs = __logs
                         break
 

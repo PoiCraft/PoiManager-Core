@@ -144,7 +144,11 @@ class BdsCore:
     # Send commend to bds and get result
     # noinspection PyUnboundLocalVariable
     def cmd_in(self, cmd: str, ignore=False):
+        self.sent_to_all('cmd_in', cmd, ignore=ignore)
         BdsLogger.put_log('cmd_in', cmd, ignore=ignore)
+        if cmd == 'restart':
+            self.bds_restart()
+            return
         in_time = datetime.now()
         _log = bds_log(time=in_time, log_type='bds', log='Null')
         if not self.if_alive():

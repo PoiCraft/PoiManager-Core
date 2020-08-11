@@ -24,9 +24,6 @@ class Ws_Cmd:
         if cmd_in is None:
             return
         self.bds.sent_to_all('cmd_in', cmd_in)
-        if cmd_in == 'restart':
-            self.bds.bds_restart()
-            return
         self.bds.cmd_in(cmd_in)
 
     def ws_cmd_in(self):

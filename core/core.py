@@ -90,11 +90,7 @@ class ManagerCore:
             if in_cmd == "manager_token":
                 print(self.tokenManager.token)
                 continue
-            self.bds.sent_to_all('cmd_in', in_cmd)
-            if in_cmd == 'restart':
-                self.restart_bds()
-            else:
-                self.bds.cmd_in(in_cmd)
+            self.bds.cmd_in(in_cmd)
 
     def route_debug(self):
         # For debug
