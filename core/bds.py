@@ -1,6 +1,5 @@
 import json
 import os
-import re
 import subprocess
 import sys
 import threading
@@ -12,6 +11,7 @@ from geventwebsocket.websocket import WebSocket
 from database import BdsLogger
 from database.ConfigHelper import get_config
 from database.database import bds_log
+from utils.bds_filter import BdsFilter
 
 
 class BdsCore:
@@ -39,6 +39,7 @@ class BdsCore:
         return self.ws_client[ws_id][1]
 
     def __init__(self, no_bds=False):
+        self.log_filter = BdsFilter()
         if no_bds:
             self.script = ''
             self.shell = True
@@ -135,16 +136,10 @@ class BdsCore:
                 self.on_stopped()
             if line != '':
                 line = line.replace('\n', '')
-                if re.match(r'\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', line):
-                    if ('Running AutoCompaction...' in line) and (get_config('ignore_auto_compaction') == 'true'):
-                        self.sent_to_all('bds', line, ignore=True)
-                        BdsLogger.put_log('bds', line, ignore=True)
-                    else:
-                        self.sent_to_all('bds', line)
-                        BdsLogger.put_log('bds', line)
-                else:
-                    self.sent_to_all('result', line)
-                    BdsLogger.put_log('result', line)
+                log_type = self.log_filter.sort_log(line)
+                if_ignore = self.log_filter.if_ignore(line)
+                self.sent_to_all(log_type, line, ignore=if_ignore)
+                BdsLogger.put_log(log_type, line, ignore=if_ignore)
 
     # Send commend to bds and get result
     # noinspection PyUnboundLocalVariable

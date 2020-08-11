@@ -1,0 +1,8 @@
+bds:
+  sort:
+    other: result
+    match:
+      bds: '\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
+  ignore:
+    in:
+      - 'Running AutoCompaction...'

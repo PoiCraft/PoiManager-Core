@@ -21,7 +21,9 @@ default = dict(
     token_length='32',
     clear_log_on_start='true',
     use_the_same_token='false',
-    ignore_auto_compaction='true'
+    bds_filter_enable='true',
+    bds_filter_type='bds',
+    bds_filter_filters='bds_filters.yaml'
 )
 
 
