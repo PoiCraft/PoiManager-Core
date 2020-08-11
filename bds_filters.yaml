@@ -1,10 +1,26 @@
 bds:
   sort:
-    other: result
+    other: 'result'
     match:
       bds:
         - '\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
         - 'NO LOG FILE! - setting up server logging...'
+  ignore:
+    in:
+      - 'Running AutoCompaction...'
+
+ez:
+  sort:
+    other: 'result'
+    match:
+      bds:
+        - '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \[A-Z] \['
+    in:
+      bds:
+        - 'ujson module not found, using json'
+        - 'msgpack not installed, MsgPackSerializer unavailable'
+        - 'HealthCheck'
+        - 'Injected!'
   ignore:
     in:
       - 'Running AutoCompaction...'
