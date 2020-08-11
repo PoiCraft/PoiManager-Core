@@ -19,9 +19,8 @@ class BdsFilter:
         self.filter_ignore_in = []
         self.filter_sort_other = ''
 
-        self.filters = yaml.load(
-            open(self.bds_filter_filters).read(),
-            Loader=yaml.FullLoader
+        self.filters = yaml.safe_load(
+            open(self.bds_filter_filters).read()
         ).get(self.bds_filter_type, None)
         if self.filters is None:
             self.bds_filter_enable = False
