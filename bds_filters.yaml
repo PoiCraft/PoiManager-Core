@@ -2,7 +2,9 @@ bds:
   sort:
     other: result
     match:
-      bds: '\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
+      bds:
+        - '\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
+        - 'NO LOG FILE! - setting up server logging...'
   ignore:
     in:
       - 'Running AutoCompaction...'

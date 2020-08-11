@@ -48,9 +48,11 @@ class BdsFilter:
         if not self.bds_filter_enable:
             return 'bds'
         for v in self.filter_sort_match:
-            if re.match(self.filter_sort_match[v], log):
-                return v
+            for _v in self.filter_sort_match[v]:
+                if re.match(_v, log):
+                    return v
         for v in self.filter_sort_in:
-            if self.filter_sort_in[v] in log:
-                return v
+            for _v in self.filter_sort_in[v]:
+                if _v in log:
+                    return v
         return self.filter_sort_other
