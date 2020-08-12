@@ -75,7 +75,6 @@ class Api_Cmd(BasicApi):
                 for v in _logs:
                     session.delete(session.query(bds_log).get(v.time))
                 _l = f'The {len(_logs)} lines of log above has been removed from db.'
-                self.bds.sent_to_all('cmd_log', _l, ignore=True)
                 BdsLogger.put_log('cmd_log', _l, ignore=True)
 
             for i in range(len(_logs)):

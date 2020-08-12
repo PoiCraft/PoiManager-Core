@@ -23,7 +23,6 @@ class Ws_Cmd:
     def cmd_in_via_ws(self, cmd_in):
         if cmd_in is None:
             return
-        self.bds.sent_to_all('cmd_in', cmd_in)
         self.bds.cmd_in(cmd_in)
 
     def ws_cmd_in(self):
