@@ -1,44 +1,22 @@
-import json
 import os
 import subprocess
 import sys
 import threading
 from datetime import datetime
 
-# noinspection PyPackageRequirements
-from geventwebsocket.websocket import WebSocket
-
 from database import BdsLogger
 from database.ConfigHelper import get_config
 from database.database import bds_log
 from utils.bds_filter import BdsFilter
+from utils.ws_utils import WebSocketCollector
 
 
 class BdsCore:
-    ws_client = {}
-    ws_client_len = 0
 
     need_log = True
 
-    def add_ws(self, ws: WebSocket):
-        self.ws_client[self.ws_client_len] = [ws, False]
-        self.ws_client_len += 1
-        return self.ws_client_len - 1
-
-    def update_ws(self, ws_id: int):
-        client = self.ws_client[ws_id]
-        if client[1] is False:
-            to_return = 1
-        else:
-            to_return = 0
-        client[1] = True
-        self.ws_client[ws_id] = client
-        return to_return
-
-    def check_ws(self, ws_id: int):
-        return self.ws_client[ws_id][1]
-
-    def __init__(self, no_bds=False):
+    def __init__(self, ws_collector: WebSocketCollector, no_bds=False):
+        self.ws_collector = ws_collector
         self.log_filter = BdsFilter()
         if no_bds:
             self.script = ''
@@ -71,7 +49,7 @@ class BdsCore:
 
     # noinspection PyMethodMayBeStatic
     def on_stopped(self):
-        self.sent_to_all('bds', 'stopping')
+        self.ws_collector.sent_to_all('bds', 'stopping', status=self.if_alive())
         BdsLogger.put_log('subprocess', 'stopped')
         print('>Server Stopped')
         print('>Bedrock Server stopped. Press Ctrl+C to exit.')
@@ -80,7 +58,7 @@ class BdsCore:
 
     def bds_restart(self):
         print('>restarting...')
-        self.sent_to_all('bds', 'restart')
+        self.ws_collector.sent_to_all('bds', 'restart', status=self.if_alive())
         BdsLogger.put_log('bds', 'restart')
         if self.if_alive():
             self.bds.stdin.write('stop\n')
@@ -107,23 +85,6 @@ class BdsCore:
         else:
             return False
 
-    def sent_to_all(self, msg_type: str, msg: str, ignore=False):
-        if ignore:
-            msg = '(ignore) ' + msg
-        clients = self.ws_client.copy()
-        for k in clients:
-            if not clients[k][0].closed:
-                if clients[k][1]:
-                    clients[k][0].send(json.dumps(
-                        {
-                            'type': msg_type,
-                            'msg': msg,
-                            'status': self.if_alive()
-                        },
-                        ensure_ascii=False))
-            else:
-                del self.ws_client[k]
-
     # Save the logs from bds to db
     def save_log(self):
         # noinspection PyUnresolvedReferences
@@ -138,13 +99,13 @@ class BdsCore:
                 line = line.replace('\n', '')
                 log_type = self.log_filter.sort_log(line)
                 if_ignore = self.log_filter.if_ignore(line)
-                self.sent_to_all(log_type, line, ignore=if_ignore)
+                self.ws_collector.sent_to_all(log_type, line, ignore=if_ignore)
                 BdsLogger.put_log(log_type, line, ignore=if_ignore)
 
     # Send commend to bds and get result
     # noinspection PyUnboundLocalVariable
     def cmd_in(self, cmd: str, ignore=False):
-        self.sent_to_all('cmd_in', cmd, ignore=ignore)
+        self.ws_collector.sent_to_all('cmd_in', cmd, status=self.if_alive(), ignore=ignore)
         BdsLogger.put_log('cmd_in', cmd, ignore=ignore)
         if cmd == 'restart':
             self.bds_restart()

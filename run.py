@@ -20,6 +20,7 @@ from loader.PropertiesLoader import PropertiesLoader
 
 # noinspection PyUnusedLocal
 from utils.init import init_db
+from utils.ws_utils import WebSocketCollector
 
 
 def CtrlC(*args):
@@ -79,9 +80,11 @@ if __name__ == '__main__':
             template_folder='template'
         )
 
+    ws_collector = WebSocketCollector()
+
     prop_loader = PropertiesLoader(no_bds=debug_no_bds)
 
-    bdsCore = BdsCore(no_bds=debug_no_bds)
+    bdsCore = BdsCore(no_bds=debug_no_bds, ws_collector=ws_collector)
 
     if get_config('clear_log_on_start') == 'true':
         BdsLogger.clear_log()
@@ -89,6 +92,7 @@ if __name__ == '__main__':
     managerCore = ManagerCore(token_manager=tokenManager,
                               bds=bdsCore,
                               prop_loader=prop_loader,
+                              ws_collector=ws_collector,
                               name=__name__,
                               app=app,
                               debug=debug)

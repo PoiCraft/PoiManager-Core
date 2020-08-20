@@ -17,6 +17,7 @@ from api.api_log import Api_Log
 from api.api_config import Api_Config
 from api.api_prop import Api_Prop
 from api.ws_cmd import Ws_Cmd
+from utils.ws_utils import WebSocketCollector
 
 
 class ManagerCore:
@@ -25,6 +26,7 @@ class ManagerCore:
                  app: Flask,
                  token_manager: TokenManager,
                  prop_loader: PropertiesLoader,
+                 ws_collector: WebSocketCollector,
                  bds: BdsCore,
                  name: str,
                  debug=False):
@@ -32,6 +34,7 @@ class ManagerCore:
         self.bds = bds
         self.tokenManager = token_manager
         self.propLoader = prop_loader
+        self.wsCollector = ws_collector
         self.t_in = threading.Thread(target=self.terminal_in)
         self.app = app
         self.socket = Sockets(self.app)
@@ -48,7 +51,8 @@ class ManagerCore:
         self.api_ws_cmd = Ws_Cmd(
             bds=self.bds,
             socket=self.socket,
-            token_manager=self.tokenManager
+            token_manager=self.tokenManager,
+            ws_collector=self.wsCollector
         )
         self.api_prop = Api_Prop(
             app=self.app,
