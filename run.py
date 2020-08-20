@@ -56,8 +56,19 @@ if __name__ == '__main__':
     if debug:
         print('>Manager Debug')
 
-    print('>Configs are:')
+    tokenManager = TokenManager(debug=debug)
+    ws_collector = WebSocketCollector()
+    prop_loader = PropertiesLoader(no_bds=debug_no_bds)
+    bdsCore = BdsCore(no_bds=debug_no_bds, ws_collector=ws_collector)
+
+    print('====================')
+    print('>Manager Configs are:')
     printConfig()
+    print('--------------------')
+    print('>Bedrock Server Configs are:')
+    print('\n'.join([f'{v}={prop_loader.prop[v]}' for v in prop_loader.prop]))
+    print('====================')
+
 
     BdsLogger.put_log('manager', 'start')
     BdsLogger.put_log('manager', '%s:%s' % (
@@ -70,7 +81,6 @@ if __name__ == '__main__':
         get_config('web_listening_port')
     ))
 
-    tokenManager = TokenManager(debug=debug)
     print('>Manager Token: %s' % tokenManager.token)
 
     app = Flask(
@@ -79,12 +89,6 @@ if __name__ == '__main__':
             static_folder='static',
             template_folder='template'
         )
-
-    ws_collector = WebSocketCollector()
-
-    prop_loader = PropertiesLoader(no_bds=debug_no_bds)
-
-    bdsCore = BdsCore(no_bds=debug_no_bds, ws_collector=ws_collector)
 
     if get_config('clear_log_on_start') == 'true':
         BdsLogger.clear_log()

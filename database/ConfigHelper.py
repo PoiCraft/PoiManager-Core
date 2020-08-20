@@ -91,8 +91,7 @@ def printConfig():
     configs_keys = []
     for v in default:
         configs_keys.append(v)
-        print('%s %s=%s' % (
-            len(configs_keys),
+        print('%s=%s' % (
             v,
             get_config(v)
         ))
