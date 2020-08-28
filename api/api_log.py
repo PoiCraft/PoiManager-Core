@@ -104,7 +104,6 @@ class Api_Log(BasicApi):
                 else:
                     start = len(_log) - length
                     stop = len(_log)
-                    print(start, stop)
                     return self.get_body(
                         body_code=200,
                         body_type=f'log_{log_type}',
