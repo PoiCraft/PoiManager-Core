@@ -17,7 +17,6 @@ from database import BdsLogger
 from database.ConfigHelper import get_config, printConfig
 from loader.PropertiesLoader import PropertiesLoader
 
-
 # noinspection PyUnusedLocal
 from utils.init import init_db
 from utils.ws_utils import WebSocketCollector
@@ -38,6 +37,8 @@ signal.signal(signal.SIGTERM, CtrlC)
 if __name__ == '__main__':
 
     print('>PoiManager-Core starting...')
+
+    abs_dir = os.path.dirname(os.path.abspath(__file__))
 
     if os.path.isfile('db.sqlite3') is not True:
         print('Database is missing, creating...')
@@ -69,7 +70,6 @@ if __name__ == '__main__':
     print('\n'.join([f'{v}={prop_loader.prop[v]}' for v in prop_loader.prop]))
     print('====================')
 
-
     BdsLogger.put_log('manager', 'start')
     BdsLogger.put_log('manager', '%s:%s' % (
         get_config('web_listening_address'),
@@ -84,11 +84,11 @@ if __name__ == '__main__':
     print('>Manager Token: %s' % tokenManager.token)
 
     app = Flask(
-            __name__,
-            static_url_path='/',
-            static_folder='static',
-            template_folder='template'
-        )
+        __name__,
+        static_url_path='/',
+        static_folder=os.path.join(abs_dir, 'static'),
+        template_folder=os.path.join(abs_dir, 'template')
+    )
 
     if get_config('clear_log_on_start') == 'true':
         BdsLogger.clear_log()
